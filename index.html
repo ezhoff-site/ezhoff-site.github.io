@@ -446,43 +446,11 @@
     @keyframes fadeOut {
       to { opacity: 0; }
     }
-
-    /* Стили для окна ввода кода */
-    .access-code-input {
-      width: 100%;
-      padding: 12px;
-      font-size: 18px;
-      border: 1px solid #d4c4b0;
-      border-radius: 20px;
-      margin: 20px 0;
-      text-align: center;
-      font-family: monospace;
-      letter-spacing: 2px;
-    }
-    .error-message {
-      color: #c44;
-      font-size: 14px;
-      margin-top: -10px;
-      margin-bottom: 10px;
-      min-height: 40px;
-    }
-    .access-btn {
-      background: #e8d5c4;
-      border: none;
-      padding: 10px 25px;
-      border-radius: 30px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .access-btn:hover {
-      background: #d4bda6;
-    }
   </style>
 </head>
 <body>
 
-<!-- ОСНОВНОЙ КОНТЕНТ (ИЗНАЧАЛЬНО СКРЫТ) -->
-<div class="app" id="appContainer" style="display: none;">
+<div class="app" id="appContainer">
   <div class="top-bar">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
   </div>
@@ -503,22 +471,11 @@
   </div>
 </div>
 
-<button class="lamp-btn" onclick="toggleCreators()" title="Создатели" style="display: none;" id="lampBtn">
+<button class="lamp-btn" onclick="toggleCreators()" title="Создатели">
   <img src="lamp.png" alt="Лампочка" onerror="this.parentElement.innerHTML='💡'">
 </button>
 
-<button class="secret-btn" onclick="openSecret()" title="" style="display: none;" id="secretBtn"></button>
-
-<!-- ОКНО ВВОДА КОДА ДОСТУПА -->
-<div class="modal-overlay" id="accessOverlay" style="display: flex; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
-  <div class="modal-card">
-    <h2>🔐 Требуется код доступа</h2>
-    <p style="color: #6b4c3b; margin-bottom: 10px;">Введите специальный код, чтобы войти</p>
-    <input type="password" class="access-code-input" id="accessCode" placeholder="******" autocomplete="off">
-    <div class="error-message" id="accessError"></div>
-    <button class="access-btn" onclick="checkAccessCode()">Войти</button>
-  </div>
-</div>
+<button class="secret-btn" onclick="openSecret()" title=""></button>
 
 <!-- Окно создателей -->
 <div class="modal-overlay" id="creatorsOverlay" onclick="closeCreatorsOutside(event)">
@@ -584,11 +541,6 @@
 </div>
 
 <script>
-// ==========================================
-// ПРАВИЛЬНЫЙ КОД ДОСТУПА (ИЗМЕНИТЕ НА СВОЙ)
-// ==========================================
-const CORRECT_ACCESS_CODE = "это_перу";  // <--- СЮДА ВСТАВЬТЕ СВОЙ КОД
-
 // ==========================================
 // НАСТРОЙКИ НАЗВАНИЙ ФОТО
 // ==========================================
@@ -765,32 +717,6 @@ function showNotification(text) {
   setTimeout(function() { notif.remove(); }, 2000);
 }
 
-// ============ ПРОВЕРКА КОДА ДОСТУПА ============
-function checkAccessCode() {
-  var inputCode = document.getElementById('accessCode').value;
-  var errorDiv = document.getElementById('accessError');
-  
-  if (inputCode === CORRECT_ACCESS_CODE) {
-    // Код верный — показываем весь функционал
-    document.getElementById('accessOverlay').style.display = 'none';
-    document.getElementById('appContainer').style.display = 'flex';
-    document.getElementById('lampBtn').style.display = 'flex';
-    document.getElementById('secretBtn').style.display = 'block';
-    render(); // отрисовываем интерфейс
-  } else {
-    errorDiv.innerHTML = '❌ Неверный код. Попробуйте ещё раз.';
-    document.getElementById('accessCode').value = '';
-    document.getElementById('accessCode').focus();
-  }
-}
-
-// Разрешаем нажать Enter в поле ввода
-document.getElementById('accessCode').addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
-    checkAccessCode();
-  }
-});
-
 // ============ ОКНО СОЗДАТЕЛЕЙ ============
 function toggleCreators() {
   var overlay = document.getElementById('creatorsOverlay');
@@ -883,7 +809,7 @@ audio.addEventListener('ended', function() {
   if (currentSong === 'yarik') firstPlay = true;
 });
 
-// Обратите внимание: render() будет вызван ТОЛЬКО после успешного ввода кода
+render();
 </script>
 
 </body>
