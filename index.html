@@ -38,107 +38,6 @@
       filter: blur(8px);
     }
 
-    .access-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(15px);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s ease;
-    }
-
-    .access-card {
-      background: rgba(255,255,255,0.95);
-      border-radius: 40px;
-      padding: 35px 30px;
-      width: 90%;
-      max-width: 450px;
-      text-align: center;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-      animation: fadeInUp 0.4s ease;
-    }
-
-    .access-card h2 {
-      margin-bottom: 15px;
-      color: #5b4332;
-    }
-
-    .access-card .date-info {
-      color: #8b7355;
-      font-size: 14px;
-      margin-bottom: 20px;
-      padding: 8px;
-      background: #f0e6dc;
-      border-radius: 20px;
-    }
-
-    .access-card .code-format {
-      color: #6b4c3b;
-      font-size: 12px;
-      margin-bottom: 10px;
-      font-family: monospace;
-      background: #e8d5c4;
-      padding: 5px;
-      border-radius: 8px;
-      display: inline-block;
-    }
-
-    .access-card input {
-      width: 100%;
-      padding: 14px 20px;
-      font-size: 18px;
-      text-align: center;
-      letter-spacing: 2px;
-      border: 2px solid #d4bda6;
-      border-radius: 50px;
-      outline: none;
-      font-family: monospace;
-      margin-bottom: 20px;
-      background: white;
-      text-transform: uppercase;
-    }
-
-    .access-card input:focus {
-      border-color: #8b5a3c;
-    }
-
-    .access-card button {
-      background: #e8d5c4;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 40px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #5b4332;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .access-card button:hover {
-      background: #d4bda6;
-      transform: scale(1.02);
-    }
-
-    .error-msg {
-      color: #b14b4b;
-      font-size: 14px;
-      margin-top: 12px;
-      min-height: 30px;
-    }
-
-    .loading {
-      color: #8b7355;
-      font-size: 14px;
-      margin-top: 12px;
-    }
-
-    /* Остальные стили */
     .top-bar {
       padding: 20px;
       min-height: 60px;
@@ -452,6 +351,62 @@
       max-width: 600px;
     }
 
+    /* Стили для окна входа */
+    .modal-card.access-card {
+      max-width: 450px;
+    }
+
+    .code-input {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 18px;
+      font-family: monospace;
+      letter-spacing: 1px;
+      text-align: center;
+      border: 2px solid #d4c4b0;
+      border-radius: 30px;
+      background: white;
+      margin: 15px 0;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    .code-input:focus {
+      border-color: #8b7355;
+      box-shadow: 0 0 0 3px rgba(139,115,85,0.2);
+    }
+
+    .error-msg {
+      color: #c44;
+      font-size: 14px;
+      margin-top: -5px;
+      margin-bottom: 15px;
+      min-height: 35px;
+    }
+
+    .access-btn {
+      background: #e8d5c4;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+      color: #5b4332;
+      font-weight: 600;
+    }
+
+    .access-btn:hover {
+      background: #d4bda6;
+      transform: scale(1.02);
+    }
+
+    .access-hint {
+      font-size: 12px;
+      color: #8b7355;
+      margin-top: 20px;
+    }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
@@ -550,19 +505,7 @@
 </head>
 <body>
 
-<div id="accessOverlay" class="access-overlay">
-  <div class="access-card">
-    <h2>🔒 Введите код доступа</h2>
-    <div class="date-info" id="dateInfo">Загрузка...</div>
-    <div class="code-format">Формат: XXXXX-XXXXX-YYYY</div>
-    <input type="text" id="accessCode" placeholder="XXXXX-XXXXX-YYYY" maxlength="19" autofocus>
-    <button onclick="checkAccess()">Войти</button>
-    <div id="accessError" class="error-msg"></div>
-    <div id="loadingMsg" class="loading"></div>
-  </div>
-</div>
-
-<div class="app" id="appContainer" style="display: none;">
+<div class="app" id="appContainer" style="filter: blur(8px);">
   <div class="top-bar">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
   </div>
@@ -589,6 +532,7 @@
 
 <button class="secret-btn" onclick="openSecret()" title=""></button>
 
+<!-- Окно создателей -->
 <div class="modal-overlay" id="creatorsOverlay" onclick="closeCreatorsOutside(event)">
   <div class="modal-card">
     <h2>✨ Создатели</h2>
@@ -617,6 +561,7 @@
   </div>
 </div>
 
+<!-- Секретное окно -->
 <div class="modal-overlay" id="secretOverlay" onclick="closeSecretOutside(event)">
   <div class="modal-card wide">
     <h2>⚠️ ВНИМАНИЕ</h2>
@@ -645,6 +590,18 @@
   </div>
 </div>
 
+<!-- Окно доступа (код) -->
+<div class="modal-overlay" id="accessOverlay" onclick="closeAccessOutside(event)">
+  <div class="modal-card access-card">
+    <h2>🔐 Вход в музей</h2>
+    <p style="margin-bottom: 10px; color: #5b4332;">Введите код доступа</p>
+    <input type="text" id="codeInput" class="code-input" placeholder="XXXXX-XXXXX-YYYY" autocomplete="off" maxlength="19">
+    <div id="errorMsg" class="error-msg"></div>
+    <button class="access-btn" onclick="checkCode()">Войти</button>
+    <div class="access-hint">Код меняется каждый день</div>
+  </div>
+</div>
+
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <span class="close">✕</span>
   <img id="lightboxImg" src="" alt="">
@@ -652,142 +609,8 @@
 
 <script>
 // ==========================================
-// СИСТЕМА ДНЕВНЫХ КОДОВ (ФОРМАТ XXXXX-XXXXX-YYYY)
+// НАСТРОЙКИ НАЗВАНИЙ ФОТО
 // ==========================================
-
-var dailyCodes = {};
-var todayCode = null;
-var codesLoaded = false;
-
-// Форматирование даты
-function getTodayDateString() {
-  var today = new Date();
-  var day = today.getDate();
-  var month = today.getMonth() + 1;
-  var year = today.getFullYear();
-  return (day < 10 ? '0' + day : day) + '.' + 
-         (month < 10 ? '0' + month : month) + '.' + 
-         year;
-}
-
-// Валидация формата кода XXXXX-XXXXX-YYYY
-function validateCodeFormat(code) {
-  // Паттерн: 5 символов (A-Z0-9) + дефис + 5 символов (A-Z0-9) + дефис + 4 символа (a-z0-9)
-  var pattern = /^[A-Z0-9]{5}-[A-Z0-9]{5}-[a-z0-9]{4}$/;
-  return pattern.test(code);
-}
-
-// Загрузка файла с кодами
-function loadCodesFile() {
-  var loadingDiv = document.getElementById('loadingMsg');
-  var dateInfo = document.getElementById('dateInfo');
-  
-  loadingDiv.textContent = 'Загрузка кодов дня...';
-  
-  fetch('codes.txt')
-    .then(function(response) {
-      if (!response.ok) {
-        throw new Error('Файл codes.txt не найден!');
-      }
-      return response.text();
-    })
-    .then(function(text) {
-      var lines = text.split('\n');
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        if (line === '' || line.startsWith('#')) continue;
-        
-        var parts = line.split(':');
-        if (parts.length === 2) {
-          var date = parts[0].trim();
-          var code = parts[1].trim().toUpperCase(); // Приводим к верхнему регистру для единообразия
-          
-          // Проверяем формат кода
-          if (validateCodeFormat(code)) {
-            dailyCodes[date] = code;
-          } else {
-            console.warn('Неверный формат кода для даты ' + date + ': ' + code);
-          }
-        }
-      }
-      
-      var today = getTodayDateString();
-      dateInfo.textContent = 'Сегодня: ' + today;
-      
-      if (dailyCodes[today]) {
-        todayCode = dailyCodes[today];
-        loadingDiv.textContent = 'Введите код доступа (формат: XXXXX-XXXXX-YYYY)';
-        codesLoaded = true;
-      } else {
-        loadingDiv.innerHTML = '⚠️ Для сегодняшней даты (' + today + ') нет кода в файле codes.txt';
-        dateInfo.style.color = '#b14b4b';
-      }
-    })
-    .catch(function(error) {
-      console.error('Ошибка загрузки codes.txt:', error);
-      loadingDiv.innerHTML = '❌ Не удалось загрузить файл с кодами. Убедитесь, что файл codes.txt есть в корне сайта.';
-      dateInfo.textContent = 'Ошибка: codes.txt не найден';
-    });
-}
-
-function checkAccess() {
-  if (!codesLoaded) {
-    document.getElementById('accessError').textContent = 'Коды ещё загружаются, подождите...';
-    return;
-  }
-  
-  var inputCode = document.getElementById('accessCode').value.trim().toUpperCase();
-  var errorDiv = document.getElementById('accessError');
-  
-  // Проверяем формат введённого кода
-  if (!validateCodeFormat(inputCode)) {
-    errorDiv.textContent = '❌ Неверный формат кода! Используйте формат: XXXXX-XXXXX-YYYY (где X=A-Z0-9, Y=a-z0-9)';
-    document.getElementById('accessCode').value = '';
-    document.getElementById('accessCode').focus();
-    return;
-  }
-  
-  if (todayCode && inputCode === todayCode) {
-    // Успешный вход
-    document.getElementById('accessOverlay').style.display = 'none';
-    document.getElementById('appContainer').style.display = 'flex';
-    initApp();
-  } else {
-    errorDiv.textContent = '❌ Неверный код для сегодняшнего дня. Попробуйте снова.';
-    document.getElementById('accessCode').value = '';
-    document.getElementById('accessCode').focus();
-  }
-}
-
-// Обработка ввода (автоматическое добавление дефисов)
-document.getElementById('accessCode').addEventListener('input', function(e) {
-  var input = e.target.value.replace(/-/g, '').toUpperCase();
-  var formatted = '';
-  
-  if (input.length > 0) {
-    formatted += input.substring(0, 5);
-    if (input.length >= 5) {
-      formatted += '-' + input.substring(5, 10);
-      if (input.length >= 10) {
-        formatted += '-' + input.substring(10, 14);
-      }
-    }
-  }
-  
-  e.target.value = formatted;
-});
-
-// Обработка нажатия Enter
-document.getElementById('accessCode').addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
-    checkAccess();
-  }
-});
-
-// ==========================================
-// ОСТАЛЬНОЙ КОД
-// ==========================================
-
 var photoNames = {
   'photo1.png': 'Дорога+',
   'photo2.jpg': 'Дорога+ в ирлэ',
@@ -802,6 +625,9 @@ var photoNames = {
   'photo_side.jpg': 'хахах ноги отрезал вумин'
 };
 
+// ==========================================
+// ДАННЫЕ
+// ==========================================
 var tree = {
   '2025': {
     type: 'folder',
@@ -823,6 +649,7 @@ var tree = {
   }
 };
 
+// ============ СОСТОЯНИЕ ============
 var path = [];
 var currentSong = 'yarik';
 var audio = new Audio('song.mp3');
@@ -830,12 +657,113 @@ audio.loop = true;
 audio.volume = 0.3;
 var START_TIME = 33;
 var firstPlay = true;
+var isAccessGranted = false;
+var todaysCode = null;
 
+// ============ ЗАГРУЗКА КОДА ИЗ TXT ============
+function loadTodaysCode() {
+  return fetch('codes.txt')
+    .then(function(response) {
+      if (!response.ok) throw new Error('Файл codes.txt не найден');
+      return response.text();
+    })
+    .then(function(text) {
+      var today = new Date();
+      var day = String(today.getDate()).padStart(2, '0');
+      var month = String(today.getMonth() + 1).padStart(2, '0');
+      var year = today.getFullYear();
+      var todayStr = day + '.' + month + '.' + year;
+      
+      var lines = text.split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (line === '') continue;
+        
+        var parts = line.split(':');
+        if (parts.length === 2 && parts[0] === todayStr) {
+          todaysCode = parts[1].trim().toUpperCase();
+          return true;
+        }
+      }
+      throw new Error('Код на сегодня не найден в codes.txt');
+    })
+    .catch(function(err) {
+      console.error('Ошибка загрузки кода:', err);
+      document.getElementById('errorMsg').innerHTML = 'Ошибка: не удалось загрузить коды';
+      return false;
+    });
+}
+
+// ============ ПРОВЕРКА КОДА ============
+function checkCode() {
+  var input = document.getElementById('codeInput');
+  var userCode = input.value.trim().toUpperCase();
+  var errorDiv = document.getElementById('errorMsg');
+  
+  if (!todaysCode) {
+    errorDiv.innerHTML = '❌ Система кодов не загружена, обновите страницу';
+    return;
+  }
+  
+  if (userCode === todaysCode) {
+    isAccessGranted = true;
+    localStorage.setItem('museum_access_granted', 'true');
+    localStorage.setItem('museum_access_date', new Date().toDateString());
+    closeAccess();
+    document.getElementById('appContainer').style.filter = 'none';
+    render();
+  } else {
+    errorDiv.innerHTML = '❌ Неверный код доступа';
+    input.value = '';
+    input.focus();
+  }
+}
+
+function closeAccess() {
+  document.getElementById('accessOverlay').classList.remove('open');
+}
+
+function closeAccessOutside(event) {
+  if (event.target === document.getElementById('accessOverlay')) {
+    closeAccess();
+  }
+}
+
+// ============ ПРОВЕРКА ДОСТУПА ПРИ ЗАГРУЗКЕ ============
+function checkAccessOnStart() {
+  var savedAccess = localStorage.getItem('museum_access_granted');
+  var savedDate = localStorage.getItem('museum_access_date');
+  var today = new Date().toDateString();
+  
+  if (savedAccess === 'true' && savedDate === today) {
+    isAccessGranted = true;
+    document.getElementById('appContainer').style.filter = 'none';
+    render();
+    return true;
+  } else {
+    localStorage.removeItem('museum_access_granted');
+    localStorage.removeItem('museum_access_date');
+    showAccessModal();
+    return false;
+  }
+}
+
+function showAccessModal() {
+  var overlay = document.getElementById('accessOverlay');
+  overlay.classList.add('open');
+  document.getElementById('codeInput').value = '';
+  document.getElementById('errorMsg').innerHTML = '';
+  document.getElementById('codeInput').focus();
+}
+
+// ============ ФУНКЦИИ САЙТА ============
 function getPhotoName(filename) {
   return photoNames[filename] || filename;
 }
 
 function render() {
+  if (!isAccessGranted) return;
+  
   var content = document.getElementById('content');
   var backBtn = document.getElementById('backBtn');
   
@@ -895,16 +823,19 @@ function render() {
 }
 
 function enterFolder(name) {
+  if (!isAccessGranted) return;
   path.push(name);
   render();
 }
 
 function goBack() {
+  if (!isAccessGranted) return;
   path.pop();
   render();
 }
 
 function openPhoto(src, title) {
+  if (!isAccessGranted) return;
   document.getElementById('lightboxImg').src = src;
   document.getElementById('lightboxImg').alt = title;
   document.getElementById('lightbox').classList.add('open');
@@ -915,6 +846,7 @@ function closeLightbox() {
 }
 
 function switchSong() {
+  if (!isAccessGranted) return;
   var wasPlaying = !audio.paused;
   audio.pause();
   
@@ -980,6 +912,7 @@ function closeCreatorsOutside(event) {
 }
 
 function openSecret() {
+  if (!isAccessGranted) return;
   var overlay = document.getElementById('secretOverlay');
   var app = document.getElementById('appContainer');
   overlay.classList.add('open');
@@ -998,6 +931,7 @@ function closeSecretOutside(event) {
 }
 
 function togglePlay() {
+  if (!isAccessGranted) return;
   if (audio.paused) {
     if (currentSong === 'yarik' && firstPlay) {
       audio.currentTime = START_TIME;
@@ -1011,46 +945,59 @@ function togglePlay() {
   }
 }
 
-function setVolume() {
-  audio.volume = document.getElementById('volume').value / 100;
-}
+audio.addEventListener('timeupdate', function() {
+  if (!isAccessGranted) return;
+  if (audio.duration) {
+    if (currentSong === 'yarik' && firstPlay && audio.paused) {
+      document.getElementById('progress').value = 0;
+      document.getElementById('time').textContent = '0:00';
+    } else {
+      var pct = (audio.currentTime / audio.duration) * 100;
+      document.getElementById('progress').value = pct;
+      var m = Math.floor(audio.currentTime / 60);
+      var s = Math.floor(audio.currentTime % 60);
+      document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    }
+  }
+});
+
+audio.addEventListener('loadedmetadata', function() {
+  if (!isAccessGranted) return;
+  document.getElementById('progress').value = 0;
+  document.getElementById('time').textContent = '0:00';
+});
 
 function seek() {
+  if (!isAccessGranted) return;
   audio.currentTime = (document.getElementById('progress').value / 100) * audio.duration;
   firstPlay = false;
 }
 
-function initApp() {
-  audio.addEventListener('timeupdate', function() {
-    if (audio.duration) {
-      if (currentSong === 'yarik' && firstPlay && audio.paused) {
-        document.getElementById('progress').value = 0;
-        document.getElementById('time').textContent = '0:00';
-      } else {
-        var pct = (audio.currentTime / audio.duration) * 100;
-        document.getElementById('progress').value = pct;
-        var m = Math.floor(audio.currentTime / 60);
-        var s = Math.floor(audio.currentTime % 60);
-        document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
-      }
-    }
-  });
-  
-  audio.addEventListener('loadedmetadata', function() {
-    document.getElementById('progress').value = 0;
-    document.getElementById('time').textContent = '0:00';
-  });
-  
-  audio.addEventListener('ended', function() {
-    document.getElementById('playBtn').textContent = '▶️';
-    if (currentSong === 'yarik') firstPlay = true;
-  });
-  
-  render();
+function setVolume() {
+  if (!isAccessGranted) return;
+  audio.volume = document.getElementById('volume').value / 100;
 }
 
-// Запуск загрузки кодов
-loadCodesFile();
+audio.addEventListener('ended', function() {
+  if (!isAccessGranted) return;
+  document.getElementById('playBtn').textContent = '▶️';
+  if (currentSong === 'yarik') firstPlay = true;
+});
+
+// ============ ЗАПУСК ============
+loadTodaysCode().then(function() {
+  if (!checkAccessOnStart()) {
+    // Показываем окно кода и ждём
+    document.getElementById('appContainer').style.filter = 'blur(8px)';
+  }
+});
+
+// Обработчик ввода по Enter
+document.getElementById('codeInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    checkCode();
+  }
+});
 </script>
 
 </body>
