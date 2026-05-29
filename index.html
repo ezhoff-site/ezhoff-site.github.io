@@ -38,7 +38,6 @@
       filter: blur(8px);
     }
 
-    /* Защитный экран */
     .access-overlay {
       position: fixed;
       top: 0;
@@ -59,7 +58,7 @@
       border-radius: 40px;
       padding: 35px 30px;
       width: 90%;
-      max-width: 400px;
+      max-width: 450px;
       text-align: center;
       box-shadow: 0 30px 60px rgba(0,0,0,0.4);
       animation: fadeInUp 0.4s ease;
@@ -79,18 +78,27 @@
       border-radius: 20px;
     }
 
+    .access-card .code-format {
+      color: #8b7355;
+      font-size: 12px;
+      margin-bottom: 15px;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+
     .access-card input {
       width: 100%;
       padding: 14px 20px;
-      font-size: 22px;
+      font-size: 18px;
       text-align: center;
-      letter-spacing: 4px;
+      letter-spacing: 2px;
       border: 2px solid #d4bda6;
       border-radius: 50px;
       outline: none;
       font-family: monospace;
       margin-bottom: 20px;
       background: white;
+      text-transform: uppercase;
     }
 
     .access-card input:focus {
@@ -544,7 +552,8 @@
   <div class="access-card">
     <h2>🔒 Доступ по коду дня</h2>
     <div class="date-info" id="dateInfo">Загрузка...</div>
-    <input type="password" id="accessCode" placeholder="Введите код" maxlength="30" autofocus>
+    <div class="code-format">Формат: XXXXX-XXXXX-YYYYY</div>
+    <input type="text" id="accessCode" placeholder="XXXXX-XXXXX-YYYYY" maxlength="17" autofocus>
     <button onclick="checkAccess()">Войти</button>
     <div id="accessError" class="error-msg"></div>
     <div id="loadingMsg" class="loading"></div>
@@ -643,14 +652,13 @@
 
 <script>
 // ==========================================
-// СИСТЕМА ДНЕВНЫХ КОДОВ ИЗ ФАЙЛА
+// СИСТЕМА ДНЕВНЫХ КОДОВ (ФОРМАТ: XXXXX-XXXXX-YYYYY)
 // ==========================================
 
-var dailyCodes = {}; // Хранилище кодов { "29.05.2026": "code", ... }
+var dailyCodes = {};
 var todayCode = null;
 var codesLoaded = false;
 
-// Форматирование даты для поиска в файле
 function getTodayDateString() {
   var today = new Date();
   var day = today.getDate();
@@ -661,7 +669,26 @@ function getTodayDateString() {
          year;
 }
 
-// Загрузка файла с кодами
+// Валидация формата кода
+function validateCodeFormat(code) {
+  // Проверяем формат: 5 символов (A-Z0-9) + дефис + 5 символов (A-Z0-9) + дефис + 5 символов (a-z0-9)
+  var pattern = /^[A-Z0-9]{5}-[A-Z0-9]{5}-[a-z0-9]{5}$/;
+  return pattern.test(code);
+}
+
+// Нормализация кода (приводим к верхнему регистру для единообразия, кроме последней части)
+function normalizeCode(code) {
+  var parts = code.split('-');
+  if (parts.length === 3) {
+    // Первые две части в верхний регистр, третью оставляем как есть
+    parts[0] = parts[0].toUpperCase();
+    parts[1] = parts[1].toUpperCase();
+    parts[2] = parts[2].toLowerCase();
+    return parts.join('-');
+  }
+  return code.toUpperCase();
+}
+
 function loadCodesFile() {
   var loadingDiv = document.getElementById('loadingMsg');
   var dateInfo = document.getElementById('dateInfo');
@@ -679,13 +706,19 @@ function loadCodesFile() {
       var lines = text.split('\n');
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i].trim();
-        if (line === '' || line.startsWith('#')) continue; // пропускаем пустые строки и комментарии
+        if (line === '' || line.startsWith('#')) continue;
         
         var parts = line.split(':');
         if (parts.length === 2) {
           var date = parts[0].trim();
-          var code = parts[1].trim();
-          dailyCodes[date] = code;
+          var code = parts[1].trim().toUpperCase(); // Сохраняем в верхнем регистре для сравнения
+          
+          // Валидация формата кода при загрузке
+          if (validateCodeFormat(code)) {
+            dailyCodes[date] = code;
+          } else {
+            console.warn('Неверный формат кода для даты ' + date + ': ' + code);
+          }
         }
       }
       
@@ -717,7 +750,25 @@ function checkAccess() {
   var inputCode = document.getElementById('accessCode').value.trim();
   var errorDiv = document.getElementById('accessError');
   
-  if (todayCode && inputCode === todayCode) {
+  // Пустая проверка
+  if (inputCode === '') {
+    errorDiv.textContent = '❌ Введите код';
+    return;
+  }
+  
+  // Валидация формата
+  if (!validateCodeFormat(inputCode)) {
+    errorDiv.textContent = '❌ Неверный формат кода. Используйте: XXXXX-XXXXX-YYYYY (где X: A-Z или 0-9, Y: a-z или 0-9)';
+    document.getElementById('accessCode').value = '';
+    document.getElementById('accessCode').focus();
+    return;
+  }
+  
+  // Нормализуем введённый код для сравнения
+  var normalizedInput = normalizeCode(inputCode);
+  var normalizedTodayCode = todayCode ? todayCode.toUpperCase() : null;
+  
+  if (todayCode && normalizedInput === normalizedTodayCode) {
     // Успешный вход
     document.getElementById('accessOverlay').style.display = 'none';
     document.getElementById('appContainer').style.display = 'flex';
@@ -734,6 +785,17 @@ document.getElementById('accessCode').addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
     checkAccess();
   }
+});
+
+// Автоматическое добавление дефисов при вводе
+document.getElementById('accessCode').addEventListener('input', function(e) {
+  var value = e.target.value.replace(/[^A-Za-z0-9]/g, '');
+  if (value.length > 5 && value.length <= 10) {
+    value = value.slice(0, 5) + '-' + value.slice(5);
+  } else if (value.length > 10) {
+    value = value.slice(0, 5) + '-' + value.slice(5, 10) + '-' + value.slice(10, 15);
+  }
+  e.target.value = value;
 });
 
 // ==========================================
