@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Выпускной 2025-2026</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f5ebe0, #e8d5c4);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      position: relative;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1000px;
+      height: 90vh;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(20px);
+      border-radius: 40px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+      transition: filter 0.5s ease;
+    }
+
+    .app.blurred {
+      filter: blur(8px);
+    }
+
+    .top-bar {
+      padding: 20px;
+      min-height: 60px;
+      position: relative;
+    }
+
+    .back-btn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      border: none;
+      background: white;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      display: none;
+      position: relative;
+      z-index: 20;
+    }
+
+    .back-btn.show {
+      display: inline-block;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .main-screen {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      height: 100%;
+      align-items: center;
+    }
+
+    .year-btn {
+      aspect-ratio: 1;
+      border-radius: 35px;
+      border: none;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(10px);
+      font-size: 80px;
+      font-weight: 700;
+      color: #6b4c3b;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .year-btn:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.8);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .photo {
+      aspect-ratio: 1;
+      border-radius: 25px;
+      background-color: #ddd;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .photo:hover {
+      transform: scale(1.03);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+
+    .photo span {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    .folder {
+      aspect-ratio: 1;
+      border-radius: 30px;
+      background: rgba(235,222,205,0.7);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 50px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .folder:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .folder .folder-name {
+      font-size: 14px;
+      margin-top: 10px;
+      color: #5b4332;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 20px;
+    }
+
+    .lightbox .close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 40px;
+      cursor: pointer;
+    }
+
+    .player {
+      padding: 15px 20px;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(15px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .player .song-label {
+      font-size: 14px;
+      color: #5b4332;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.3s;
+      padding: 5px 10px;
+      border-radius: 15px;
+      user-select: none;
+    }
+
+    .player .song-label:hover {
+      background: rgba(0,0,0,0.05);
+      transform: scale(1.05);
+    }
+
+    .player .song-label:active {
+      transform: scale(0.95);
+    }
+
+    .player button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #e8d5c4;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .player .progress-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+    }
+
+    .player .progress-wrap input[type="range"] {
+      flex: 1;
+    }
+
+    .player .volume-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .player .volume-wrap input[type="range"] {
+      width: 80px;
+    }
+
+    .player .time-text {
+      font-size: 13px;
+      color: #5b4332;
+      min-width: 35px;
+    }
+
+    .lamp-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      z-index: 500;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .lamp-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+      background: rgba(255,255,200,0.8);
+    }
+
+    .lamp-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .secret-btn {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(5px);
+      cursor: pointer;
+      z-index: 500;
+      transition: all 0.3s;
+      opacity: 0;
+    }
+
+    .secret-btn:hover {
+      background: rgba(255,255,255,0.4);
+      opacity: 0.3;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 600;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 40px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      text-align: center;
+      animation: fadeInUp 0.4s ease;
+      filter: none !important;
+    }
+
+    /* Секретное окно — шире */
+    .modal-card.wide {
+      max-width: 600px;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-card h2 {
+      font-size: 24px;
+      color: #5b4332;
+      margin-bottom: 25px;
+    }
+
+    .creator-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      font-size: 16px;
+    }
+
+    .creator-name {
+      font-weight: 700;
+      color: #3d2c20;
+      min-width: 80px;
+      text-align: left;
+    }
+
+    .creator-dots {
+      flex: 1;
+      border-bottom: 2px dotted #c4a88b;
+      margin: 0 15px;
+      height: 0;
+    }
+
+    .creator-role {
+      color: #8b7355;
+      text-align: right;
+      font-style: italic;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #d4c4b0;
+      margin: 15px 0;
+    }
+
+    .close-modal {
+      margin-top: 25px;
+      padding: 10px 30px;
+      border-radius: 20px;
+      border: none;
+      background: #e8d5c4;
+      color: #5b4332;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .close-modal:hover {
+      background: #d4bda6;
+    }
+
+    .secret-text {
+      font-size: 20px;
+      color: #5b4332;
+      line-height: 1.8;
+      font-style: italic;
+      white-space: nowrap;
+    }
+
+    .song-notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-size: 14px;
+      color: #5b4332;
+      z-index: 700;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: slideDown 0.3s ease, fadeOut 0.3s ease 1.7s forwards;
+      pointer-events: none;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app" id="appContainer">
+  <div class="top-bar">
+    <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
+  </div>
+  
+  <div class="content" id="content"></div>
+  
+  <div class="player">
+    <span class="song-label" id="songLabel" onclick="switchSong()" title="Нажми, чтобы сменить песню">🎵 Любимая песня ярика</span>
+    <button id="playBtn" onclick="togglePlay()">▶️</button>
+    <div class="progress-wrap">
+      <input type="range" id="progress" value="0" min="0" max="100" oninput="seek()">
+      <span class="time-text" id="time">0:00</span>
+    </div>
+    <div class="volume-wrap">
+      <span>🔊</span>
+      <input type="range" id="volume" min="0" max="100" value="30" oninput="setVolume()">
+    </div>
+  </div>
+</div>
+
+<button class="lamp-btn" onclick="toggleCreators()" title="Создатели">
+  <img src="lamp.png" alt="Лампочка" onerror="this.parentElement.innerHTML='💡'">
+</button>
+
+<button class="secret-btn" onclick="openSecret()" title=""></button>
+
+<!-- Окно создателей -->
+<div class="modal-overlay" id="creatorsOverlay" onclick="closeCreatorsOutside(event)">
+  <div class="modal-card">
+    <h2>✨ Создатели</h2>
+    
+    <div class="creator-row">
+      <span class="creator-name">Мирпик</span>
+      <span class="creator-dots"></span>
+      <span class="creator-role">Придумал сайт</span>
+    </div>
+    
+    <div class="creator-row">
+      <span class="creator-name">Ёжик</span>
+      <span class="creator-dots"></span>
+      <span class="creator-role">Сгенерил его через дипсик</span>
+    </div>
+    
+    <hr class="divider">
+    
+    <div class="creator-row">
+      <span class="creator-name">Ярик</span>
+      <span class="creator-dots"></span>
+      <span class="creator-role">Зажал 50 рублей на хостинг</span>
+    </div>
+    
+    <button class="close-modal" onclick="closeCreators()">Понятно</button>
+  </div>
+</div>
+
+<!-- Секретное окно — широкое -->
+<div class="modal-overlay" id="secretOverlay" onclick="closeSecretOutside(event)">
+  <div class="modal-card wide">
+    <h2>⚠️ ВНИМАНИЕ</h2>
+    <p class="secret-text">
+      Стоп, наблюдается взлом. Матрица дала сбой
+    </p>
+    <p class="secret-text">
+      Быть на месте моём, должен кто-то другой...
+    </p>
+    <p class="secret-text">
+      Рефлексия затянула будто водоворот...
+    </p>
+    <p class="secret-text">
+      ЭТО ВСЕ НЕ СО МНОЙ
+    </p>
+    <p class="secret-text">
+      ЭТО ВСЕ НЕ СО МНОЙ
+    </p>
+    <p class="secret-text">
+      ЭТО ВСЕ НЕ СО МНОЙ
+    </p>
+    <p class="secret-text">
+      ЭТО ВСЕ НЕ СО МНОЙ
+    </p>
+    <button class="close-modal" onclick="closeSecret()">Осознать</button>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="close">✕</span>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+// ==========================================
+// НАСТРОЙКИ НАЗВАНИЙ ФОТО
+// ==========================================
+var photoNames = {
+  'photo1.png': 'Дорога+',
+  'photo2.jpg': 'Дорога+ в ирлэ',
+  'photo3.jpg': 'Круговорот ежа в няшках',
+  'photo4.jpg': 'Ламинария...',
+  'photo5.jpg': 'Ньюгенчик не выдержки',
+  'photo6.jpg': 'По генеральски',
+  'photo7.jpg': 'Реальное лица ежа не фейк',
+  'photo8.png': 'Еж с презиками на крыше мск-сити',
+  'photo2026_1.jpg': 'Растер девушку на руках не фейк ебать',
+  'photo2026_2.jpg': 'Сложил руки блин',
+  'photo_side.jpg': 'хахах ноги отрезал вумин'
+};
+
+// ==========================================
+// ДАННЫЕ
+// ==========================================
+var tree = {
+  '2025': {
+    type: 'folder',
+    name: '2025',
+    photos: [
+      'photo1.png', 'photo2.jpg', 'photo3.jpg', 'photo4.jpg',
+      'photo5.jpg', 'photo6.jpg', 'photo7.jpg', 'photo8.png'
+    ]
+  },
+  '2026': {
+    type: 'folder',
+    name: '2026',
+    photos: ['photo2026_1.jpg', 'photo2026_2.jpg'],
+    folders: {
+      'побочные': {
+        photos: ['photo_side.jpg']
+      }
+    }
+  }
+};
+
+// ============ СОСТОЯНИЕ ============
+var path = [];
+var currentSong = 'yarik';
+var audio = new Audio('song.mp3');
+audio.loop = true;
+audio.volume = 0.3;
+var START_TIME = 33;
+var firstPlay = true;
+
+// ============ ФУНКЦИИ ============
+function getPhotoName(filename) {
+  return photoNames[filename] || filename;
+}
+
+function render() {
+  var content = document.getElementById('content');
+  var backBtn = document.getElementById('backBtn');
+  
+  if (path.length > 0) {
+    backBtn.classList.add('show');
+  } else {
+    backBtn.classList.remove('show');
+  }
+  
+  if (path.length === 0) {
+    content.innerHTML = `
+      <div class="main-screen">
+        <div class="year-btn" onclick="enterFolder('2025')">2025</div>
+        <div class="year-btn" onclick="enterFolder('2026')">2026</div>
+      </div>
+    `;
+    return;
+  }
+  
+  var current = tree;
+  for (var i = 0; i < path.length; i++) {
+    if (current.folders && current.folders[path[i]]) {
+      current = current.folders[path[i]];
+    } else if (current[path[i]]) {
+      current = current[path[i]];
+    } else {
+      content.innerHTML = '<p>Папка не найдена</p>';
+      return;
+    }
+  }
+  
+  var html = '<div class="grid">';
+  
+  if (current.photos) {
+    for (var p = 0; p < current.photos.length; p++) {
+      var photoFile = current.photos[p];
+      var photoTitle = getPhotoName(photoFile);
+      
+      html += '<div class="photo" style="background-image:url(\'' + photoFile + '\')" onclick="openPhoto(\'' + photoFile + '\', \'' + photoTitle + '\')">';
+      html += '<span>' + photoTitle + '</span>';
+      html += '</div>';
+    }
+  }
+  
+  if (current.folders) {
+    var folderNames = Object.keys(current.folders);
+    for (var f = 0; f < folderNames.length; f++) {
+      html += '<div class="folder" onclick="enterFolder(\'' + folderNames[f] + '\')">';
+      html += '📁';
+      html += '<div class="folder-name">' + folderNames[f] + '</div>';
+      html += '</div>';
+    }
+  }
+  
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+function enterFolder(name) {
+  path.push(name);
+  render();
+}
+
+function goBack() {
+  path.pop();
+  render();
+}
+
+function openPhoto(src, title) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxImg').alt = title;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+function switchSong() {
+  var wasPlaying = !audio.paused;
+  audio.pause();
+  
+  if (currentSong === 'yarik') {
+    currentSong = 'ezhik';
+    audio.src = 'song_2.mp3';
+    document.getElementById('songLabel').textContent = '🎵 Любимая песня ёжика';
+    showNotification('Переключено на: Любимая песня ёжика');
+    firstPlay = false;
+  } else {
+    currentSong = 'yarik';
+    audio.src = 'song.mp3';
+    document.getElementById('songLabel').textContent = '🎵 Любимая песня ярика';
+    showNotification('Переключено на: Любимая песня ярика');
+    firstPlay = true;
+  }
+  
+  audio.volume = document.getElementById('volume').value / 100;
+  audio.loop = true;
+  document.getElementById('progress').value = 0;
+  document.getElementById('time').textContent = '0:00';
+  document.getElementById('playBtn').textContent = '▶️';
+  
+  if (wasPlaying) {
+    audio.play().then(function() {
+      if (currentSong === 'yarik') {
+        audio.currentTime = START_TIME;
+      }
+      document.getElementById('playBtn').textContent = '⏸️';
+    }).catch(function() {});
+  }
+}
+
+function showNotification(text) {
+  var notif = document.createElement('div');
+  notif.className = 'song-notification';
+  notif.textContent = text;
+  document.body.appendChild(notif);
+  setTimeout(function() { notif.remove(); }, 2000);
+}
+
+// ============ ОКНО СОЗДАТЕЛЕЙ ============
+function toggleCreators() {
+  var overlay = document.getElementById('creatorsOverlay');
+  var app = document.getElementById('appContainer');
+  if (overlay.classList.contains('open')) {
+    overlay.classList.remove('open');
+    app.classList.remove('blurred');
+  } else {
+    overlay.classList.add('open');
+    app.classList.add('blurred');
+  }
+}
+
+function closeCreators() {
+  document.getElementById('creatorsOverlay').classList.remove('open');
+  document.getElementById('appContainer').classList.remove('blurred');
+}
+
+function closeCreatorsOutside(event) {
+  if (event.target === document.getElementById('creatorsOverlay')) {
+    closeCreators();
+  }
+}
+
+// ============ СЕКРЕТНОЕ ОКНО ============
+function openSecret() {
+  var overlay = document.getElementById('secretOverlay');
+  var app = document.getElementById('appContainer');
+  overlay.classList.add('open');
+  app.classList.add('blurred');
+}
+
+function closeSecret() {
+  document.getElementById('secretOverlay').classList.remove('open');
+  document.getElementById('appContainer').classList.remove('blurred');
+}
+
+function closeSecretOutside(event) {
+  if (event.target === document.getElementById('secretOverlay')) {
+    closeSecret();
+  }
+}
+
+// ============ ПЛЕЕР ============
+function togglePlay() {
+  if (audio.paused) {
+    if (currentSong === 'yarik' && firstPlay) {
+      audio.currentTime = START_TIME;
+    }
+    firstPlay = false;
+    audio.play();
+    document.getElementById('playBtn').textContent = '⏸️';
+  } else {
+    audio.pause();
+    document.getElementById('playBtn').textContent = '▶️';
+  }
+}
+
+audio.addEventListener('timeupdate', function() {
+  if (audio.duration) {
+    if (currentSong === 'yarik' && firstPlay && audio.paused) {
+      document.getElementById('progress').value = 0;
+      document.getElementById('time').textContent = '0:00';
+    } else {
+      var pct = (audio.currentTime / audio.duration) * 100;
+      document.getElementById('progress').value = pct;
+      var m = Math.floor(audio.currentTime / 60);
+      var s = Math.floor(audio.currentTime % 60);
+      document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    }
+  }
+});
+
+audio.addEventListener('loadedmetadata', function() {
+  document.getElementById('progress').value = 0;
+  document.getElementById('time').textContent = '0:00';
+});
+
+function seek() {
+  audio.currentTime = (document.getElementById('progress').value / 100) * audio.duration;
+  firstPlay = false;
+}
+
+function setVolume() {
+  audio.volume = document.getElementById('volume').value / 100;
+}
+
+audio.addEventListener('ended', function() {
+  document.getElementById('playBtn').textContent = '▶️';
+  if (currentSong === 'yarik') firstPlay = true;
+});
+
+render();
+</script>
+
+</body>
+</html>
