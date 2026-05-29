@@ -595,25 +595,11 @@ var tree = {
 // ============ СОСТОЯНИЕ ============
 var path = [];
 var currentSong = 'yarik';
-
-// Основной плеер
 var audio = new Audio('song.mp3');
 audio.loop = true;
 audio.volume = 0.3;
-
-// Фоновая музыка
-var bgAudio = new Audio('song_3.mp3');
-bgAudio.loop = true;
-bgAudio.volume = 0.03;
-
 var START_TIME = 33;
 var firstPlay = true;
-
-// Автозапуск фоновой музыки
-document.addEventListener('click', function startBgMusic() {
-  bgAudio.play().catch(function(){});
-  document.removeEventListener('click', startBgMusic);
-});
 
 // ============ ФУНКЦИИ ============
 function getPhotoName(filename) {
@@ -623,13 +609,13 @@ function getPhotoName(filename) {
 function render() {
   var content = document.getElementById('content');
   var backBtn = document.getElementById('backBtn');
-
+  
   if (path.length > 0) {
     backBtn.classList.add('show');
   } else {
     backBtn.classList.remove('show');
   }
-
+  
   if (path.length === 0) {
     content.innerHTML = `
       <div class="main-screen">
@@ -639,9 +625,8 @@ function render() {
     `;
     return;
   }
-
+  
   var current = tree;
-
   for (var i = 0; i < path.length; i++) {
     if (current.folders && current.folders[path[i]]) {
       current = current.folders[path[i]];
@@ -652,23 +637,22 @@ function render() {
       return;
     }
   }
-
+  
   var html = '<div class="grid">';
-
+  
   if (current.photos) {
     for (var p = 0; p < current.photos.length; p++) {
       var photoFile = current.photos[p];
       var photoTitle = getPhotoName(photoFile);
-
+      
       html += '<div class="photo" style="background-image:url(\'' + photoFile + '\')" onclick="openPhoto(\'' + photoFile + '\', \'' + photoTitle + '\')">';
       html += '<span>' + photoTitle + '</span>';
       html += '</div>';
     }
   }
-
+  
   if (current.folders) {
     var folderNames = Object.keys(current.folders);
-
     for (var f = 0; f < folderNames.length; f++) {
       html += '<div class="folder" onclick="enterFolder(\'' + folderNames[f] + '\')">';
       html += '📁';
@@ -676,9 +660,8 @@ function render() {
       html += '</div>';
     }
   }
-
+  
   html += '</div>';
-
   content.innerHTML = html;
 }
 
@@ -703,164 +686,141 @@ function closeLightbox() {
 }
 
 function switchSong() {
-
   var wasPlaying = !audio.paused;
-
   audio.pause();
-
-  // Останавливаем фон
-  bgAudio.pause();
-
+  
   if (currentSong === 'yarik') {
-
     currentSong = 'ezhik';
-
     audio.src = 'song_2.mp3';
-
-    document.getElementById('songLabel').textContent =
-      '🎵 Любимая песня ёжика';
-
+    document.getElementById('songLabel').textContent = '🎵 Любимая песня ёжика';
     showNotification('Переключено на: Любимая песня ёжика');
-
     firstPlay = false;
-
   } else {
-
     currentSong = 'yarik';
-
     audio.src = 'song.mp3';
-
-    document.getElementById('songLabel').textContent =
-      '🎵 Любимая песня ярика';
-
+    document.getElementById('songLabel').textContent = '🎵 Любимая песня ярика';
     showNotification('Переключено на: Любимая песня ярика');
-
     firstPlay = true;
   }
-
-  audio.volume =
-    document.getElementById('volume').value / 100;
-
+  
+  audio.volume = document.getElementById('volume').value / 100;
   audio.loop = true;
-
   document.getElementById('progress').value = 0;
-
   document.getElementById('time').textContent = '0:00';
-
   document.getElementById('playBtn').textContent = '▶️';
-
+  
   if (wasPlaying) {
-
     audio.play().then(function() {
-
       if (currentSong === 'yarik') {
         audio.currentTime = START_TIME;
       }
-
       document.getElementById('playBtn').textContent = '⏸️';
-
-    }).catch(function(){});
+    }).catch(function() {});
   }
 }
 
 function showNotification(text) {
-
   var notif = document.createElement('div');
-
   notif.className = 'song-notification';
-
   notif.textContent = text;
-
   document.body.appendChild(notif);
+  setTimeout(function() { notif.remove(); }, 2000);
+}
 
-  setTimeout(function() {
-    notif.remove();
-  }, 2000);
+// ============ ОКНО СОЗДАТЕЛЕЙ ============
+function toggleCreators() {
+  var overlay = document.getElementById('creatorsOverlay');
+  var app = document.getElementById('appContainer');
+  if (overlay.classList.contains('open')) {
+    overlay.classList.remove('open');
+    app.classList.remove('blurred');
+  } else {
+    overlay.classList.add('open');
+    app.classList.add('blurred');
+  }
+}
+
+function closeCreators() {
+  document.getElementById('creatorsOverlay').classList.remove('open');
+  document.getElementById('appContainer').classList.remove('blurred');
+}
+
+function closeCreatorsOutside(event) {
+  if (event.target === document.getElementById('creatorsOverlay')) {
+    closeCreators();
+  }
+}
+
+// ============ СЕКРЕТНОЕ ОКНО ============
+function openSecret() {
+  var overlay = document.getElementById('secretOverlay');
+  var app = document.getElementById('appContainer');
+  overlay.classList.add('open');
+  app.classList.add('blurred');
+}
+
+function closeSecret() {
+  document.getElementById('secretOverlay').classList.remove('open');
+  document.getElementById('appContainer').classList.remove('blurred');
+}
+
+function closeSecretOutside(event) {
+  if (event.target === document.getElementById('secretOverlay')) {
+    closeSecret();
+  }
 }
 
 // ============ ПЛЕЕР ============
 function togglePlay() {
-
   if (audio.paused) {
-
-    // Останавливаем фон
-    bgAudio.pause();
-
     if (currentSong === 'yarik' && firstPlay) {
       audio.currentTime = START_TIME;
     }
-
     firstPlay = false;
-
     audio.play();
-
     document.getElementById('playBtn').textContent = '⏸️';
-
   } else {
-
-    // Пауза основного трека
     audio.pause();
-
-    // Возвращаем фон
-    bgAudio.play().catch(function(){});
-
     document.getElementById('playBtn').textContent = '▶️';
   }
 }
 
 audio.addEventListener('timeupdate', function() {
-
   if (audio.duration) {
-
-    var pct =
-      (audio.currentTime / audio.duration) * 100;
-
-    document.getElementById('progress').value = pct;
-
-    var m = Math.floor(audio.currentTime / 60);
-
-    var s = Math.floor(audio.currentTime % 60);
-
-    document.getElementById('time').textContent =
-      m + ':' + (s < 10 ? '0' : '') + s;
+    if (currentSong === 'yarik' && firstPlay && audio.paused) {
+      document.getElementById('progress').value = 0;
+      document.getElementById('time').textContent = '0:00';
+    } else {
+      var pct = (audio.currentTime / audio.duration) * 100;
+      document.getElementById('progress').value = pct;
+      var m = Math.floor(audio.currentTime / 60);
+      var s = Math.floor(audio.currentTime % 60);
+      document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    }
   }
 });
 
 audio.addEventListener('loadedmetadata', function() {
-
   document.getElementById('progress').value = 0;
-
   document.getElementById('time').textContent = '0:00';
 });
 
 function seek() {
-
-  audio.currentTime =
-    (document.getElementById('progress').value / 100)
-    * audio.duration;
-
+  audio.currentTime = (document.getElementById('progress').value / 100) * audio.duration;
   firstPlay = false;
 }
 
 function setVolume() {
-
-  audio.volume =
-    document.getElementById('volume').value / 100;
+  audio.volume = document.getElementById('volume').value / 100;
 }
 
 audio.addEventListener('ended', function() {
-
   document.getElementById('playBtn').textContent = '▶️';
-
-  if (currentSong === 'yarik') {
-    firstPlay = true;
-  }
-
-  // Возвращаем фоновую музыку
-  bgAudio.play().catch(function(){});
+  if (currentSong === 'yarik') firstPlay = true;
 });
 
 render();
 </script>
+
 </body>
 </html>
