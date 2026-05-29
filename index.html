@@ -347,64 +347,9 @@
       filter: none !important;
     }
 
+    /* Секретное окно — шире */
     .modal-card.wide {
       max-width: 600px;
-    }
-
-    /* Стили для окна входа */
-    .modal-card.access-card {
-      max-width: 450px;
-    }
-
-    .code-input {
-      width: 100%;
-      padding: 14px 18px;
-      font-size: 18px;
-      font-family: monospace;
-      letter-spacing: 1px;
-      text-align: center;
-      border: 2px solid #d4c4b0;
-      border-radius: 30px;
-      background: white;
-      margin: 15px 0;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    .code-input:focus {
-      border-color: #8b7355;
-      box-shadow: 0 0 0 3px rgba(139,115,85,0.2);
-    }
-
-    .error-msg {
-      color: #c44;
-      font-size: 14px;
-      margin-top: -5px;
-      margin-bottom: 15px;
-      min-height: 35px;
-    }
-
-    .access-btn {
-      background: #e8d5c4;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 30px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-      color: #5b4332;
-      font-weight: 600;
-    }
-
-    .access-btn:hover {
-      background: #d4bda6;
-      transform: scale(1.02);
-    }
-
-    .access-hint {
-      font-size: 12px;
-      color: #8b7355;
-      margin-top: 20px;
     }
 
     @keyframes fadeInUp {
@@ -501,11 +446,43 @@
     @keyframes fadeOut {
       to { opacity: 0; }
     }
+
+    /* Стили для окна ввода кода */
+    .access-code-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      border: 1px solid #d4c4b0;
+      border-radius: 20px;
+      margin: 20px 0;
+      text-align: center;
+      font-family: monospace;
+      letter-spacing: 2px;
+    }
+    .error-message {
+      color: #c44;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      min-height: 40px;
+    }
+    .access-btn {
+      background: #e8d5c4;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 30px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .access-btn:hover {
+      background: #d4bda6;
+    }
   </style>
 </head>
 <body>
 
-<div class="app" id="appContainer" style="filter: blur(8px);">
+<!-- ОСНОВНОЙ КОНТЕНТ (ИЗНАЧАЛЬНО СКРЫТ) -->
+<div class="app" id="appContainer" style="display: none;">
   <div class="top-bar">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
   </div>
@@ -526,11 +503,22 @@
   </div>
 </div>
 
-<button class="lamp-btn" onclick="toggleCreators()" title="Создатели">
+<button class="lamp-btn" onclick="toggleCreators()" title="Создатели" style="display: none;" id="lampBtn">
   <img src="lamp.png" alt="Лампочка" onerror="this.parentElement.innerHTML='💡'">
 </button>
 
-<button class="secret-btn" onclick="openSecret()" title=""></button>
+<button class="secret-btn" onclick="openSecret()" title="" style="display: none;" id="secretBtn"></button>
+
+<!-- ОКНО ВВОДА КОДА ДОСТУПА -->
+<div class="modal-overlay" id="accessOverlay" style="display: flex; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+  <div class="modal-card">
+    <h2>🔐 Требуется код доступа</h2>
+    <p style="color: #6b4c3b; margin-bottom: 10px;">Введите специальный код, чтобы войти</p>
+    <input type="password" class="access-code-input" id="accessCode" placeholder="******" autocomplete="off">
+    <div class="error-message" id="accessError"></div>
+    <button class="access-btn" onclick="checkAccessCode()">Войти</button>
+  </div>
+</div>
 
 <!-- Окно создателей -->
 <div class="modal-overlay" id="creatorsOverlay" onclick="closeCreatorsOutside(event)">
@@ -561,7 +549,7 @@
   </div>
 </div>
 
-<!-- Секретное окно -->
+<!-- Секретное окно — широкое -->
 <div class="modal-overlay" id="secretOverlay" onclick="closeSecretOutside(event)">
   <div class="modal-card wide">
     <h2>⚠️ ВНИМАНИЕ</h2>
@@ -590,24 +578,17 @@
   </div>
 </div>
 
-<!-- Окно доступа (код) -->
-<div class="modal-overlay" id="accessOverlay" onclick="closeAccessOutside(event)">
-  <div class="modal-card access-card">
-    <h2>🔐 Вход в музей</h2>
-    <p style="margin-bottom: 10px; color: #5b4332;">Введите код доступа</p>
-    <input type="text" id="codeInput" class="code-input" placeholder="XXXXX-XXXXX-YYYY" autocomplete="off" maxlength="19">
-    <div id="errorMsg" class="error-msg"></div>
-    <button class="access-btn" onclick="checkCode()">Войти</button>
-    <div class="access-hint">Код меняется каждый день</div>
-  </div>
-</div>
-
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <span class="close">✕</span>
   <img id="lightboxImg" src="" alt="">
 </div>
 
 <script>
+// ==========================================
+// ПРАВИЛЬНЫЙ КОД ДОСТУПА (ИЗМЕНИТЕ НА СВОЙ)
+// ==========================================
+const CORRECT_ACCESS_CODE = "няшка2025";  // <--- СЮДА ВСТАВЬТЕ СВОЙ КОД
+
 // ==========================================
 // НАСТРОЙКИ НАЗВАНИЙ ФОТО
 // ==========================================
@@ -657,113 +638,13 @@ audio.loop = true;
 audio.volume = 0.3;
 var START_TIME = 33;
 var firstPlay = true;
-var isAccessGranted = false;
-var todaysCode = null;
 
-// ============ ЗАГРУЗКА КОДА ИЗ TXT ============
-function loadTodaysCode() {
-  return fetch('codes.txt')
-    .then(function(response) {
-      if (!response.ok) throw new Error('Файл codes.txt не найден');
-      return response.text();
-    })
-    .then(function(text) {
-      var today = new Date();
-      var day = String(today.getDate()).padStart(2, '0');
-      var month = String(today.getMonth() + 1).padStart(2, '0');
-      var year = today.getFullYear();
-      var todayStr = day + '.' + month + '.' + year;
-      
-      var lines = text.split('\n');
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        if (line === '') continue;
-        
-        var parts = line.split(':');
-        if (parts.length === 2 && parts[0] === todayStr) {
-          todaysCode = parts[1].trim().toUpperCase();
-          return true;
-        }
-      }
-      throw new Error('Код на сегодня не найден в codes.txt');
-    })
-    .catch(function(err) {
-      console.error('Ошибка загрузки кода:', err);
-      document.getElementById('errorMsg').innerHTML = 'Ошибка: не удалось загрузить коды';
-      return false;
-    });
-}
-
-// ============ ПРОВЕРКА КОДА ============
-function checkCode() {
-  var input = document.getElementById('codeInput');
-  var userCode = input.value.trim(); // НЕ переводим в верхний регистр!
-  var errorDiv = document.getElementById('errorMsg');
-  
-  if (!todaysCode) {
-    errorDiv.innerHTML = '❌ Система кодов не загружена, обновите страницу';
-    return;
-  }
-  
-  // Сравниваем как есть (с учётом регистра)
-  if (userCode === todaysCode) {
-    isAccessGranted = true;
-    localStorage.setItem('museum_access_granted', 'true');
-    localStorage.setItem('museum_access_date', new Date().toDateString());
-    closeAccess();
-    document.getElementById('appContainer').style.filter = 'none';
-    render();
-  } else {
-    errorDiv.innerHTML = '❌ Неверный код доступа. Сегодняшний код: ' + todaysCode; // Временно для отладки
-    input.value = '';
-    input.focus();
-  }
-}
-function closeAccess() {
-  document.getElementById('accessOverlay').classList.remove('open');
-}
-
-function closeAccessOutside(event) {
-  if (event.target === document.getElementById('accessOverlay')) {
-    closeAccess();
-  }
-}
-
-// ============ ПРОВЕРКА ДОСТУПА ПРИ ЗАГРУЗКЕ ============
-function checkAccessOnStart() {
-  var savedAccess = localStorage.getItem('museum_access_granted');
-  var savedDate = localStorage.getItem('museum_access_date');
-  var today = new Date().toDateString();
-  
-  if (savedAccess === 'true' && savedDate === today) {
-    isAccessGranted = true;
-    document.getElementById('appContainer').style.filter = 'none';
-    render();
-    return true;
-  } else {
-    localStorage.removeItem('museum_access_granted');
-    localStorage.removeItem('museum_access_date');
-    showAccessModal();
-    return false;
-  }
-}
-
-function showAccessModal() {
-  var overlay = document.getElementById('accessOverlay');
-  overlay.classList.add('open');
-  document.getElementById('codeInput').value = '';
-  document.getElementById('errorMsg').innerHTML = '';
-  document.getElementById('codeInput').focus();
-}
-
-// ============ ФУНКЦИИ САЙТА ============
+// ============ ФУНКЦИИ ============
 function getPhotoName(filename) {
   return photoNames[filename] || filename;
 }
 
 function render() {
-  if (!isAccessGranted) return;
-  
   var content = document.getElementById('content');
   var backBtn = document.getElementById('backBtn');
   
@@ -823,19 +704,16 @@ function render() {
 }
 
 function enterFolder(name) {
-  if (!isAccessGranted) return;
   path.push(name);
   render();
 }
 
 function goBack() {
-  if (!isAccessGranted) return;
   path.pop();
   render();
 }
 
 function openPhoto(src, title) {
-  if (!isAccessGranted) return;
   document.getElementById('lightboxImg').src = src;
   document.getElementById('lightboxImg').alt = title;
   document.getElementById('lightbox').classList.add('open');
@@ -846,7 +724,6 @@ function closeLightbox() {
 }
 
 function switchSong() {
-  if (!isAccessGranted) return;
   var wasPlaying = !audio.paused;
   audio.pause();
   
@@ -888,6 +765,33 @@ function showNotification(text) {
   setTimeout(function() { notif.remove(); }, 2000);
 }
 
+// ============ ПРОВЕРКА КОДА ДОСТУПА ============
+function checkAccessCode() {
+  var inputCode = document.getElementById('accessCode').value;
+  var errorDiv = document.getElementById('accessError');
+  
+  if (inputCode === CORRECT_ACCESS_CODE) {
+    // Код верный — показываем весь функционал
+    document.getElementById('accessOverlay').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'flex';
+    document.getElementById('lampBtn').style.display = 'flex';
+    document.getElementById('secretBtn').style.display = 'block';
+    render(); // отрисовываем интерфейс
+  } else {
+    errorDiv.innerHTML = '❌ Неверный код. Попробуйте ещё раз.';
+    document.getElementById('accessCode').value = '';
+    document.getElementById('accessCode').focus();
+  }
+}
+
+// Разрешаем нажать Enter в поле ввода
+document.getElementById('accessCode').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    checkAccessCode();
+  }
+});
+
+// ============ ОКНО СОЗДАТЕЛЕЙ ============
 function toggleCreators() {
   var overlay = document.getElementById('creatorsOverlay');
   var app = document.getElementById('appContainer');
@@ -911,8 +815,8 @@ function closeCreatorsOutside(event) {
   }
 }
 
+// ============ СЕКРЕТНОЕ ОКНО ============
 function openSecret() {
-  if (!isAccessGranted) return;
   var overlay = document.getElementById('secretOverlay');
   var app = document.getElementById('appContainer');
   overlay.classList.add('open');
@@ -930,8 +834,8 @@ function closeSecretOutside(event) {
   }
 }
 
+// ============ ПЛЕЕР ============
 function togglePlay() {
-  if (!isAccessGranted) return;
   if (audio.paused) {
     if (currentSong === 'yarik' && firstPlay) {
       audio.currentTime = START_TIME;
@@ -946,7 +850,6 @@ function togglePlay() {
 }
 
 audio.addEventListener('timeupdate', function() {
-  if (!isAccessGranted) return;
   if (audio.duration) {
     if (currentSong === 'yarik' && firstPlay && audio.paused) {
       document.getElementById('progress').value = 0;
@@ -962,42 +865,25 @@ audio.addEventListener('timeupdate', function() {
 });
 
 audio.addEventListener('loadedmetadata', function() {
-  if (!isAccessGranted) return;
   document.getElementById('progress').value = 0;
   document.getElementById('time').textContent = '0:00';
 });
 
 function seek() {
-  if (!isAccessGranted) return;
   audio.currentTime = (document.getElementById('progress').value / 100) * audio.duration;
   firstPlay = false;
 }
 
 function setVolume() {
-  if (!isAccessGranted) return;
   audio.volume = document.getElementById('volume').value / 100;
 }
 
 audio.addEventListener('ended', function() {
-  if (!isAccessGranted) return;
   document.getElementById('playBtn').textContent = '▶️';
   if (currentSong === 'yarik') firstPlay = true;
 });
 
-// ============ ЗАПУСК ============
-loadTodaysCode().then(function() {
-  if (!checkAccessOnStart()) {
-    // Показываем окно кода и ждём
-    document.getElementById('appContainer').style.filter = 'blur(8px)';
-  }
-});
-
-// Обработчик ввода по Enter
-document.getElementById('codeInput').addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
-    checkCode();
-  }
-});
+// Обратите внимание: render() будет вызван ТОЛЬКО после успешного ввода кода
 </script>
 
 </body>
