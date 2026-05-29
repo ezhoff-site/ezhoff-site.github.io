@@ -38,6 +38,96 @@
       filter: blur(8px);
     }
 
+    /* Защитный экран */
+    .access-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(15px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+
+    .access-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 40px;
+      padding: 35px 30px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .access-card h2 {
+      margin-bottom: 15px;
+      color: #5b4332;
+    }
+
+    .access-card .date-info {
+      color: #8b7355;
+      font-size: 14px;
+      margin-bottom: 20px;
+      padding: 8px;
+      background: #f0e6dc;
+      border-radius: 20px;
+    }
+
+    .access-card input {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 22px;
+      text-align: center;
+      letter-spacing: 4px;
+      border: 2px solid #d4bda6;
+      border-radius: 50px;
+      outline: none;
+      font-family: monospace;
+      margin-bottom: 20px;
+      background: white;
+    }
+
+    .access-card input:focus {
+      border-color: #8b5a3c;
+    }
+
+    .access-card button {
+      background: #e8d5c4;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 40px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #5b4332;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .access-card button:hover {
+      background: #d4bda6;
+      transform: scale(1.02);
+    }
+
+    .error-msg {
+      color: #b14b4b;
+      font-size: 14px;
+      margin-top: 12px;
+      min-height: 30px;
+    }
+
+    .loading {
+      color: #8b7355;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    /* Остальные стили (ваши исходные) */
     .top-bar {
       padding: 20px;
       min-height: 60px;
@@ -347,7 +437,6 @@
       filter: none !important;
     }
 
-    /* Секретное окно — шире */
     .modal-card.wide {
       max-width: 600px;
     }
@@ -450,7 +539,19 @@
 </head>
 <body>
 
-<div class="app" id="appContainer">
+<!-- ЭКРАН ВВОДА КОДА -->
+<div id="accessOverlay" class="access-overlay">
+  <div class="access-card">
+    <h2>🔒 Доступ по коду дня</h2>
+    <div class="date-info" id="dateInfo">Загрузка...</div>
+    <input type="password" id="accessCode" placeholder="Введите код" maxlength="30" autofocus>
+    <button onclick="checkAccess()">Войти</button>
+    <div id="accessError" class="error-msg"></div>
+    <div id="loadingMsg" class="loading"></div>
+  </div>
+</div>
+
+<div class="app" id="appContainer" style="display: none;">
   <div class="top-bar">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
   </div>
@@ -506,7 +607,7 @@
   </div>
 </div>
 
-<!-- Секретное окно — широкое -->
+<!-- Секретное окно -->
 <div class="modal-overlay" id="secretOverlay" onclick="closeSecretOutside(event)">
   <div class="modal-card wide">
     <h2>⚠️ ВНИМАНИЕ</h2>
@@ -542,8 +643,103 @@
 
 <script>
 // ==========================================
-// НАСТРОЙКИ НАЗВАНИЙ ФОТО
+// СИСТЕМА ДНЕВНЫХ КОДОВ ИЗ ФАЙЛА
 // ==========================================
+
+var dailyCodes = {}; // Хранилище кодов { "29.05.2026": "code", ... }
+var todayCode = null;
+var codesLoaded = false;
+
+// Форматирование даты для поиска в файле
+function getTodayDateString() {
+  var today = new Date();
+  var day = today.getDate();
+  var month = today.getMonth() + 1;
+  var year = today.getFullYear();
+  return (day < 10 ? '0' + day : day) + '.' + 
+         (month < 10 ? '0' + month : month) + '.' + 
+         year;
+}
+
+// Загрузка файла с кодами
+function loadCodesFile() {
+  var loadingDiv = document.getElementById('loadingMsg');
+  var dateInfo = document.getElementById('dateInfo');
+  
+  loadingDiv.textContent = 'Загрузка кодов дня...';
+  
+  fetch('codes.txt')
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error('Файл codes.txt не найден!');
+      }
+      return response.text();
+    })
+    .then(function(text) {
+      var lines = text.split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (line === '' || line.startsWith('#')) continue; // пропускаем пустые строки и комментарии
+        
+        var parts = line.split(':');
+        if (parts.length === 2) {
+          var date = parts[0].trim();
+          var code = parts[1].trim();
+          dailyCodes[date] = code;
+        }
+      }
+      
+      var today = getTodayDateString();
+      dateInfo.textContent = 'Сегодня: ' + today;
+      
+      if (dailyCodes[today]) {
+        todayCode = dailyCodes[today];
+        loadingDiv.textContent = 'Введите код доступа на сегодня';
+        codesLoaded = true;
+      } else {
+        loadingDiv.innerHTML = '⚠️ Для сегодняшней даты (' + today + ') нет кода в файле codes.txt';
+        dateInfo.style.color = '#b14b4b';
+      }
+    })
+    .catch(function(error) {
+      console.error('Ошибка загрузки codes.txt:', error);
+      loadingDiv.innerHTML = '❌ Не удалось загрузить файл с кодами. Убедитесь, что файл codes.txt есть в корне сайта.';
+      dateInfo.textContent = 'Ошибка: codes.txt не найден';
+    });
+}
+
+function checkAccess() {
+  if (!codesLoaded) {
+    document.getElementById('accessError').textContent = 'Коды ещё загружаются, подождите...';
+    return;
+  }
+  
+  var inputCode = document.getElementById('accessCode').value.trim();
+  var errorDiv = document.getElementById('accessError');
+  
+  if (todayCode && inputCode === todayCode) {
+    // Успешный вход
+    document.getElementById('accessOverlay').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'flex';
+    initApp();
+  } else {
+    errorDiv.textContent = '❌ Неверный код для сегодняшнего дня. Попробуйте снова.';
+    document.getElementById('accessCode').value = '';
+    document.getElementById('accessCode').focus();
+  }
+}
+
+// Обработка нажатия Enter
+document.getElementById('accessCode').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    checkAccess();
+  }
+});
+
+// ==========================================
+// ОСТАЛЬНОЙ КОД (ваши данные)
+// ==========================================
+
 var photoNames = {
   'photo1.png': 'Дорога+',
   'photo2.jpg': 'Дорога+ в ирлэ',
@@ -558,9 +754,6 @@ var photoNames = {
   'photo_side.jpg': 'хахах ноги отрезал вумин'
 };
 
-// ==========================================
-// ДАННЫЕ
-// ==========================================
 var tree = {
   '2025': {
     type: 'folder',
@@ -582,7 +775,6 @@ var tree = {
   }
 };
 
-// ============ СОСТОЯНИЕ ============
 var path = [];
 var currentSong = 'yarik';
 var audio = new Audio('song.mp3');
@@ -591,7 +783,6 @@ audio.volume = 0.3;
 var START_TIME = 33;
 var firstPlay = true;
 
-// ============ ФУНКЦИИ ============
 function getPhotoName(filename) {
   return photoNames[filename] || filename;
 }
@@ -717,7 +908,6 @@ function showNotification(text) {
   setTimeout(function() { notif.remove(); }, 2000);
 }
 
-// ============ ОКНО СОЗДАТЕЛЕЙ ============
 function toggleCreators() {
   var overlay = document.getElementById('creatorsOverlay');
   var app = document.getElementById('appContainer');
@@ -741,7 +931,6 @@ function closeCreatorsOutside(event) {
   }
 }
 
-// ============ СЕКРЕТНОЕ ОКНО ============
 function openSecret() {
   var overlay = document.getElementById('secretOverlay');
   var app = document.getElementById('appContainer');
@@ -760,7 +949,6 @@ function closeSecretOutside(event) {
   }
 }
 
-// ============ ПЛЕЕР ============
 function togglePlay() {
   if (audio.paused) {
     if (currentSong === 'yarik' && firstPlay) {
@@ -775,41 +963,46 @@ function togglePlay() {
   }
 }
 
-audio.addEventListener('timeupdate', function() {
-  if (audio.duration) {
-    if (currentSong === 'yarik' && firstPlay && audio.paused) {
-      document.getElementById('progress').value = 0;
-      document.getElementById('time').textContent = '0:00';
-    } else {
-      var pct = (audio.currentTime / audio.duration) * 100;
-      document.getElementById('progress').value = pct;
-      var m = Math.floor(audio.currentTime / 60);
-      var s = Math.floor(audio.currentTime % 60);
-      document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
-    }
-  }
-});
-
-audio.addEventListener('loadedmetadata', function() {
-  document.getElementById('progress').value = 0;
-  document.getElementById('time').textContent = '0:00';
-});
+function setVolume() {
+  audio.volume = document.getElementById('volume').value / 100;
+}
 
 function seek() {
   audio.currentTime = (document.getElementById('progress').value / 100) * audio.duration;
   firstPlay = false;
 }
 
-function setVolume() {
-  audio.volume = document.getElementById('volume').value / 100;
+function initApp() {
+  audio.addEventListener('timeupdate', function() {
+    if (audio.duration) {
+      if (currentSong === 'yarik' && firstPlay && audio.paused) {
+        document.getElementById('progress').value = 0;
+        document.getElementById('time').textContent = '0:00';
+      } else {
+        var pct = (audio.currentTime / audio.duration) * 100;
+        document.getElementById('progress').value = pct;
+        var m = Math.floor(audio.currentTime / 60);
+        var s = Math.floor(audio.currentTime % 60);
+        document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+      }
+    }
+  });
+  
+  audio.addEventListener('loadedmetadata', function() {
+    document.getElementById('progress').value = 0;
+    document.getElementById('time').textContent = '0:00';
+  });
+  
+  audio.addEventListener('ended', function() {
+    document.getElementById('playBtn').textContent = '▶️';
+    if (currentSong === 'yarik') firstPlay = true;
+  });
+  
+  render();
 }
 
-audio.addEventListener('ended', function() {
-  document.getElementById('playBtn').textContent = '▶️';
-  if (currentSong === 'yarik') firstPlay = true;
-});
-
-render();
+// Запуск загрузки кодов
+loadCodesFile();
 </script>
 
 </body>
