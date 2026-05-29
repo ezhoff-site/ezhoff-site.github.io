@@ -79,11 +79,14 @@
     }
 
     .access-card .code-format {
-      color: #8b7355;
+      color: #6b4c3b;
       font-size: 12px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       font-family: monospace;
-      letter-spacing: 1px;
+      background: #e8d5c4;
+      padding: 5px;
+      border-radius: 8px;
+      display: inline-block;
     }
 
     .access-card input {
@@ -135,7 +138,7 @@
       margin-top: 12px;
     }
 
-    /* Остальные стили (ваши исходные) */
+    /* Остальные стили */
     .top-bar {
       padding: 20px;
       min-height: 60px;
@@ -547,13 +550,12 @@
 </head>
 <body>
 
-<!-- ЭКРАН ВВОДА КОДА -->
 <div id="accessOverlay" class="access-overlay">
   <div class="access-card">
-    <h2>🔒 Доступ по коду дня</h2>
+    <h2>🔒 Введите код доступа</h2>
     <div class="date-info" id="dateInfo">Загрузка...</div>
-    <div class="code-format">Формат: XXXXX-XXXXX-YYYYY</div>
-    <input type="text" id="accessCode" placeholder="XXXXX-XXXXX-YYYYY" maxlength="17" autofocus>
+    <div class="code-format">Формат: XXXXX-XXXXX-YYYY</div>
+    <input type="text" id="accessCode" placeholder="XXXXX-XXXXX-YYYY" maxlength="19" autofocus>
     <button onclick="checkAccess()">Войти</button>
     <div id="accessError" class="error-msg"></div>
     <div id="loadingMsg" class="loading"></div>
@@ -587,7 +589,6 @@
 
 <button class="secret-btn" onclick="openSecret()" title=""></button>
 
-<!-- Окно создателей -->
 <div class="modal-overlay" id="creatorsOverlay" onclick="closeCreatorsOutside(event)">
   <div class="modal-card">
     <h2>✨ Создатели</h2>
@@ -616,7 +617,6 @@
   </div>
 </div>
 
-<!-- Секретное окно -->
 <div class="modal-overlay" id="secretOverlay" onclick="closeSecretOutside(event)">
   <div class="modal-card wide">
     <h2>⚠️ ВНИМАНИЕ</h2>
@@ -652,13 +652,14 @@
 
 <script>
 // ==========================================
-// СИСТЕМА ДНЕВНЫХ КОДОВ (ФОРМАТ: XXXXX-XXXXX-YYYYY)
+// СИСТЕМА ДНЕВНЫХ КОДОВ (ФОРМАТ XXXXX-XXXXX-YYYY)
 // ==========================================
 
 var dailyCodes = {};
 var todayCode = null;
 var codesLoaded = false;
 
+// Форматирование даты
 function getTodayDateString() {
   var today = new Date();
   var day = today.getDate();
@@ -669,26 +670,14 @@ function getTodayDateString() {
          year;
 }
 
-// Валидация формата кода
+// Валидация формата кода XXXXX-XXXXX-YYYY
 function validateCodeFormat(code) {
-  // Проверяем формат: 5 символов (A-Z0-9) + дефис + 5 символов (A-Z0-9) + дефис + 5 символов (a-z0-9)
-  var pattern = /^[A-Z0-9]{5}-[A-Z0-9]{5}-[a-z0-9]{5}$/;
+  // Паттерн: 5 символов (A-Z0-9) + дефис + 5 символов (A-Z0-9) + дефис + 4 символа (a-z0-9)
+  var pattern = /^[A-Z0-9]{5}-[A-Z0-9]{5}-[a-z0-9]{4}$/;
   return pattern.test(code);
 }
 
-// Нормализация кода (приводим к верхнему регистру для единообразия, кроме последней части)
-function normalizeCode(code) {
-  var parts = code.split('-');
-  if (parts.length === 3) {
-    // Первые две части в верхний регистр, третью оставляем как есть
-    parts[0] = parts[0].toUpperCase();
-    parts[1] = parts[1].toUpperCase();
-    parts[2] = parts[2].toLowerCase();
-    return parts.join('-');
-  }
-  return code.toUpperCase();
-}
-
+// Загрузка файла с кодами
 function loadCodesFile() {
   var loadingDiv = document.getElementById('loadingMsg');
   var dateInfo = document.getElementById('dateInfo');
@@ -711,9 +700,9 @@ function loadCodesFile() {
         var parts = line.split(':');
         if (parts.length === 2) {
           var date = parts[0].trim();
-          var code = parts[1].trim().toUpperCase(); // Сохраняем в верхнем регистре для сравнения
+          var code = parts[1].trim().toUpperCase(); // Приводим к верхнему регистру для единообразия
           
-          // Валидация формата кода при загрузке
+          // Проверяем формат кода
           if (validateCodeFormat(code)) {
             dailyCodes[date] = code;
           } else {
@@ -727,7 +716,7 @@ function loadCodesFile() {
       
       if (dailyCodes[today]) {
         todayCode = dailyCodes[today];
-        loadingDiv.textContent = 'Введите код доступа на сегодня';
+        loadingDiv.textContent = 'Введите код доступа (формат: XXXXX-XXXXX-YYYY)';
         codesLoaded = true;
       } else {
         loadingDiv.innerHTML = '⚠️ Для сегодняшней даты (' + today + ') нет кода в файле codes.txt';
@@ -747,28 +736,18 @@ function checkAccess() {
     return;
   }
   
-  var inputCode = document.getElementById('accessCode').value.trim();
+  var inputCode = document.getElementById('accessCode').value.trim().toUpperCase();
   var errorDiv = document.getElementById('accessError');
   
-  // Пустая проверка
-  if (inputCode === '') {
-    errorDiv.textContent = '❌ Введите код';
-    return;
-  }
-  
-  // Валидация формата
+  // Проверяем формат введённого кода
   if (!validateCodeFormat(inputCode)) {
-    errorDiv.textContent = '❌ Неверный формат кода. Используйте: XXXXX-XXXXX-YYYYY (где X: A-Z или 0-9, Y: a-z или 0-9)';
+    errorDiv.textContent = '❌ Неверный формат кода! Используйте формат: XXXXX-XXXXX-YYYY (где X=A-Z0-9, Y=a-z0-9)';
     document.getElementById('accessCode').value = '';
     document.getElementById('accessCode').focus();
     return;
   }
   
-  // Нормализуем введённый код для сравнения
-  var normalizedInput = normalizeCode(inputCode);
-  var normalizedTodayCode = todayCode ? todayCode.toUpperCase() : null;
-  
-  if (todayCode && normalizedInput === normalizedTodayCode) {
+  if (todayCode && inputCode === todayCode) {
     // Успешный вход
     document.getElementById('accessOverlay').style.display = 'none';
     document.getElementById('appContainer').style.display = 'flex';
@@ -780,6 +759,24 @@ function checkAccess() {
   }
 }
 
+// Обработка ввода (автоматическое добавление дефисов)
+document.getElementById('accessCode').addEventListener('input', function(e) {
+  var input = e.target.value.replace(/-/g, '').toUpperCase();
+  var formatted = '';
+  
+  if (input.length > 0) {
+    formatted += input.substring(0, 5);
+    if (input.length >= 5) {
+      formatted += '-' + input.substring(5, 10);
+      if (input.length >= 10) {
+        formatted += '-' + input.substring(10, 14);
+      }
+    }
+  }
+  
+  e.target.value = formatted;
+});
+
 // Обработка нажатия Enter
 document.getElementById('accessCode').addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
@@ -787,19 +784,8 @@ document.getElementById('accessCode').addEventListener('keypress', function(e) {
   }
 });
 
-// Автоматическое добавление дефисов при вводе
-document.getElementById('accessCode').addEventListener('input', function(e) {
-  var value = e.target.value.replace(/[^A-Za-z0-9]/g, '');
-  if (value.length > 5 && value.length <= 10) {
-    value = value.slice(0, 5) + '-' + value.slice(5);
-  } else if (value.length > 10) {
-    value = value.slice(0, 5) + '-' + value.slice(5, 10) + '-' + value.slice(10, 15);
-  }
-  e.target.value = value;
-});
-
 // ==========================================
-// ОСТАЛЬНОЙ КОД (ваши данные)
+// ОСТАЛЬНОЙ КОД
 // ==========================================
 
 var photoNames = {
