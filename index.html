@@ -697,7 +697,7 @@ function loadTodaysCode() {
 // ============ ПРОВЕРКА КОДА ============
 function checkCode() {
   var input = document.getElementById('codeInput');
-  var userCode = input.value.trim().toUpperCase();
+  var userCode = input.value.trim(); // НЕ переводим в верхний регистр!
   var errorDiv = document.getElementById('errorMsg');
   
   if (!todaysCode) {
@@ -705,6 +705,7 @@ function checkCode() {
     return;
   }
   
+  // Сравниваем как есть (с учётом регистра)
   if (userCode === todaysCode) {
     isAccessGranted = true;
     localStorage.setItem('museum_access_granted', 'true');
@@ -713,12 +714,11 @@ function checkCode() {
     document.getElementById('appContainer').style.filter = 'none';
     render();
   } else {
-    errorDiv.innerHTML = '❌ Неверный код доступа';
+    errorDiv.innerHTML = '❌ Неверный код доступа. Сегодняшний код: ' + todaysCode; // Временно для отладки
     input.value = '';
     input.focus();
   }
 }
-
 function closeAccess() {
   document.getElementById('accessOverlay').classList.remove('open');
 }
