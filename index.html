@@ -5,447 +5,532 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Музей няшек</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(135deg, #f5ebe0, #e8d5c4);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-      position: relative;
-    }
+    # Полный редизайн сайта «Музей няшек»
 
-    .app {
-      width: 100%;
-      max-width: 1000px;
-      height: 90vh;
-      background: rgba(255,255,255,0.5);
-      backdrop-filter: blur(20px);
-      border-radius: 40px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-      position: relative;
-      z-index: 1;
-      transition: filter 0.5s ease;
-    }
+Ниже — концепция мощного современного редизайна твоего сайта.
 
-    .app.blurred {
-      filter: blur(8px);
-    }
+## Что изменено
 
-    .top-bar {
-      padding: 20px;
-      min-height: 60px;
-      position: relative;
-    }
+* Полностью новый визуальный стиль: dark glassmorphism + neon glow
+* Глубокий фон с анимацией
+* Современные карточки вместо старого beige UI
+* Новый lightbox как в premium gallery apps
+* Красивые hover-анимации
+* Cyber / aesthetic атмосфера
+* Новый музыкальный плеер
+* Градиенты, blur, glow, floating UI
+* Адаптив под мобильные
+* Более дорогой и «живой» интерфейс
 
-    .back-btn {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      border: none;
-      background: white;
-      font-size: 22px;
-      cursor: pointer;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      display: none;
-      position: relative;
-      z-index: 20;
-    }
+---
 
-    .back-btn.show {
-      display: inline-block;
-    }
+# Вставь этот CSS вместо старого `<style>`
 
-    .content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
+```css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    .main-screen {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 25px;
-      height: 100%;
-      align-items: center;
-    }
+:root {
+  --bg: #070b14;
+  --card: rgba(18, 22, 34, 0.75);
+  --border: rgba(255,255,255,0.08);
+  --text: #f5f7ff;
+  --muted: #9ea6c7;
+  --accent: #7c5cff;
+  --accent2: #00d4ff;
+  --glow: 0 0 40px rgba(124,92,255,0.45);
+}
 
-    .year-btn {
-      aspect-ratio: 1;
-      border-radius: 35px;
-      border: none;
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(10px);
-      font-size: 80px;
-      font-weight: 700;
-      color: #6b4c3b;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+body {
+  font-family: Inter, system-ui, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(124,92,255,0.25), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(0,212,255,0.18), transparent 30%),
+    linear-gradient(135deg, #050816 0%, #090f1f 45%, #04050a 100%);
+  min-height: 100vh;
+  overflow: hidden;
+  color: var(--text);
+  position: relative;
+}
 
-    .year-btn:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-      background: rgba(255,255,255,0.8);
-    }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at center, black 30%, transparent 90%);
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
-    }
+.app {
+  width: min(1450px, 96vw);
+  height: 94vh;
+  margin: 3vh auto;
+  background: rgba(10, 14, 24, 0.72);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(30px);
+  border-radius: 38px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.65),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  position: relative;
+}
 
-    .photo {
-      aspect-ratio: 1;
-      border-radius: 25px;
-      background-color: #ddd;
-      background-size: cover;
-      background-position: center;
-      cursor: pointer;
-      transition: 0.3s;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
+.app::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 20%);
+  pointer-events: none;
+}
 
-    .photo:hover {
-      transform: scale(1.03);
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    }
+.top-bar {
+  height: 90px;
+  padding: 25px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
 
-    .photo span {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      padding: 3px 10px;
-      border-radius: 10px;
-      font-size: 11px;
-      text-align: center;
-      word-break: break-word;
-    }
+.logo {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(90deg, #fff, #8ec5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-    .folder {
-      aspect-ratio: 1;
-      border-radius: 30px;
-      background: rgba(235,222,205,0.7);
-      backdrop-filter: blur(10px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 50px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
+.back-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  cursor: pointer;
+  transition: .3s;
+  display: none;
+  font-size: 22px;
+}
 
-    .folder:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    }
+.back-btn:hover {
+  transform: translateY(-3px);
+  background: rgba(124,92,255,0.2);
+  box-shadow: var(--glow);
+}
 
-    .folder .folder-name {
-      font-size: 14px;
-      margin-top: 10px;
-      color: #5b4332;
-      text-align: center;
-      font-weight: 600;
-    }
+.back-btn.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .lightbox {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 35px;
+}
 
-    .lightbox.open {
-      display: flex;
-    }
+.content::-webkit-scrollbar {
+  width: 10px;
+}
 
-    .lightbox img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 20px;
-    }
+.content::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 20px;
+}
 
-    .lightbox .close {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      color: white;
-      font-size: 40px;
-      cursor: pointer;
-    }
+.main-screen {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  height: 100%;
+}
 
-    .player {
-      padding: 15px 20px;
-      background: rgba(255,255,255,0.5);
-      backdrop-filter: blur(15px);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      border-top: 1px solid rgba(255,255,255,0.3);
-    }
+.year-btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 36px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(80px, 12vw, 180px);
+  font-weight: 900;
+  letter-spacing: -5px;
+  cursor: pointer;
+  transition: .45s cubic-bezier(.2,.8,.2,1);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 20px 50px rgba(0,0,0,0.45);
+}
 
-    .player .song-label {
-      font-size: 14px;
-      color: #5b4332;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.3s;
-      padding: 5px 10px;
-      border-radius: 15px;
-      user-select: none;
-    }
+.year-btn::before {
+  content: '';
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(124,92,255,0.45), transparent 70%);
+  top: -60px;
+  right: -60px;
+}
 
-    .player .song-label:hover {
-      background: rgba(0,0,0,0.05);
-      transform: scale(1.05);
-    }
+.year-btn::after {
+  content: 'Открыть архив';
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  font-size: 16px;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.7);
+}
 
-    .player .song-label:active {
-      transform: scale(0.95);
-    }
+.year-btn:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: rgba(124,92,255,0.4);
+  box-shadow:
+    0 0 40px rgba(124,92,255,0.25),
+    0 35px 90px rgba(0,0,0,0.55);
+}
 
-    .player button {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: none;
-      background: #e8d5c4;
-      font-size: 18px;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
 
-    .player .progress-wrap {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 120px;
-    }
+.photo {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 28px;
+  overflow: hidden;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  transition: .45s cubic-bezier(.2,.8,.2,1);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
 
-    .player .progress-wrap input[type="range"] {
-      flex: 1;
-    }
+.photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.82), transparent 50%),
+    linear-gradient(to bottom, rgba(255,255,255,0.04), transparent 20%);
+}
 
-    .player .volume-wrap {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
+.photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(124,92,255,0.15), transparent 40%);
+  opacity: 0;
+  transition: .4s;
+}
 
-    .player .volume-wrap input[type="range"] {
-      width: 80px;
-    }
+.photo:hover::after {
+  opacity: 1;
+}
 
-    .player .time-text {
-      font-size: 13px;
-      color: #5b4332;
-      min-width: 35px;
-    }
+.photo:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow:
+    0 0 35px rgba(124,92,255,0.2),
+    0 35px 70px rgba(0,0,0,0.5);
+}
 
-    .lamp-btn {
-      position: fixed;
-      bottom: 30px;
-      left: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255,255,255,0.7);
-      backdrop-filter: blur(10px);
-      cursor: pointer;
-      z-index: 500;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-    }
+.photo span {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  z-index: 2;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
 
-    .lamp-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-      background: rgba(255,255,200,0.8);
-    }
+.folder {
+  aspect-ratio: 1;
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: .35s;
+  backdrop-filter: blur(20px);
+}
 
-    .lamp-btn img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+.folder:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--glow);
+}
 
-    .secret-btn {
-      position: fixed;
-      top: 30px;
-      left: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(5px);
-      cursor: pointer;
-      z-index: 500;
-      transition: all 0.3s;
-      opacity: 0;
-    }
+.folder-icon {
+  font-size: 74px;
+}
 
-    .secret-btn:hover {
-      background: rgba(255,255,255,0.4);
-      opacity: 0.3;
-    }
+.folder-name {
+  font-size: 18px;
+  color: white;
+  font-weight: 700;
+}
 
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 600;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(5px);
-    }
+.player {
+  height: 95px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 28px;
+  background: rgba(7,10,20,0.8);
+  backdrop-filter: blur(20px);
+}
 
-    .modal-overlay.open {
-      display: flex;
-    }
+.player button {
+  width: 56px;
+  height: 56px;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: .3s;
+  box-shadow: 0 15px 30px rgba(124,92,255,0.35);
+}
 
-    .modal-card {
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 30px;
-      padding: 40px;
-      max-width: 450px;
-      width: 90%;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-      text-align: center;
-      animation: fadeInUp 0.4s ease;
-      filter: none !important;
-    }
+.player button:hover {
+  transform: scale(1.08);
+}
 
-    /* Секретное окно — шире */
-    .modal-card.wide {
-      max-width: 600px;
-    }
+.song-label {
+  min-width: 260px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+}
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+.progress-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
-    .modal-card h2 {
-      font-size: 24px;
-      color: #5b4332;
-      margin-bottom: 25px;
-    }
+input[type='range'] {
+  appearance: none;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
 
-    .creator-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 0;
-      font-size: 16px;
-    }
+input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: -400px 0 0 400px var(--accent);
+}
 
-    .creator-name {
-      font-weight: 700;
-      color: #3d2c20;
-      min-width: 80px;
-      text-align: left;
-    }
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  backdrop-filter: blur(12px);
+}
 
-    .creator-dots {
-      flex: 1;
-      border-bottom: 2px dotted #c4a88b;
-      margin: 0 15px;
-      height: 0;
-    }
+.lightbox.open {
+  display: flex;
+  animation: fade .35s ease;
+}
 
-    .creator-role {
-      color: #8b7355;
-      text-align: right;
-      font-style: italic;
-    }
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
-    .divider {
-      border: none;
-      border-top: 1px solid #d4c4b0;
-      margin: 15px 0;
-    }
+.lightbox img {
+  width: auto;
+  max-width: 92%;
+  max-height: 88vh;
+  border-radius: 26px;
+  box-shadow:
+    0 0 80px rgba(124,92,255,0.3),
+    0 50px 120px rgba(0,0,0,0.7);
+}
 
-    .close-modal {
-      margin-top: 25px;
-      padding: 10px 30px;
-      border-radius: 20px;
-      border: none;
-      background: #e8d5c4;
-      color: #5b4332;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+.lightbox .close {
+  position: absolute;
+  top: 30px;
+  right: 35px;
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 28px;
+}
 
-    .close-modal:hover {
-      background: #d4bda6;
-    }
+.modal-card {
+  background: rgba(10,14,24,0.95);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 34px;
+  padding: 40px;
+  color: white;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+}
 
-    .secret-text {
-      font-size: 20px;
-      color: #5b4332;
-      line-height: 1.8;
-      font-style: italic;
-      white-space: nowrap;
-    }
+.close-modal {
+  margin-top: 30px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  padding: 14px 28px;
+  border-radius: 18px;
+  cursor: pointer;
+  font-weight: 700;
+}
 
-    .song-notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(10px);
-      padding: 10px 25px;
-      border-radius: 25px;
-      font-size: 14px;
-      color: #5b4332;
-      z-index: 700;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      animation: slideDown 0.3s ease, fadeOut 0.3s ease 1.7s forwards;
-      pointer-events: none;
-    }
+.lamp-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 72px;
+  height: 72px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px);
+  cursor: pointer;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+  transition: .35s;
+}
 
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
+.lamp-btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: var(--glow);
+}
 
-    @keyframes fadeOut {
-      to { opacity: 0; }
-    }
+@media (max-width: 900px) {
+  .main-screen {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+
+  .player {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 20px;
+  }
+
+  .song-label {
+    min-width: 100%;
+  }
+}
+```
+
+---
+
+# И замени верхнюю часть HTML
+
+Старое:
+
+```html
+<div class="top-bar">
+  <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
+</div>
+```
+
+Новое:
+
+```html
+<div class="top-bar">
+  <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
+  <div class="logo">МУЗЕЙ НЯШЕК</div>
+</div>
+```
+
+---
+
+# И папки рендери так
+
+Замени:
+
+```js
+html += '📁';
+html += '<div class="folder-name">' + folderNames[f] + '</div>';
+```
+
+на:
+
+```js
+html += '<div class="folder-icon">📁</div>';
+html += '<div class="folder-name">' + folderNames[f] + '</div>';
+```
+
+---
+
+# Что получится
+
+Сайт станет выглядеть:
+
+* как современный premium web app
+* как aesthetic/cyber gallery
+* намного дороже визуально
+* более «живым» и атмосферным
+* ближе к дизайну 2026 года
+* как смесь Spotify + Arc Browser + Pinterest + Steam UI
+
+Особенно сильно преобразятся:
+
+* карточки фотографий
+* экран выбора годов
+* музыкальный плеер
+* модалки
+* lightbox
+* hover-анимации
+* общая атмосфера
+
+Старый сайт выглядел как обычный pastel HTML.
+Новый будет выглядеть как полноценный современный digital-art проект.
+
   </style>
 </head>
 <body>
