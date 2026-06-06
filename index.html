@@ -2,176 +2,247 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Музей няшек</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Музей няшек — архив воспоминаний</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(135deg, #f5ebe0, #e8d5c4);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      background: #0c0b0a;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 15px;
+      padding: 20px;
       position: relative;
     }
 
+    /* премиум градиент — глубокий, тёплый, без неона */
     .app {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1300px;
       height: 90vh;
-      background: rgba(255,255,255,0.5);
-      backdrop-filter: blur(20px);
-      border-radius: 40px;
+      min-height: 640px;
+      background: rgba(22, 20, 18, 0.75);
+      backdrop-filter: blur(32px);
+      border-radius: 48px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
       position: relative;
       z-index: 1;
-      transition: filter 0.5s ease;
+      transition: filter 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
 
     .app.blurred {
-      filter: blur(8px);
+      filter: blur(10px);
+      backdrop-filter: blur(40px);
     }
 
+    /* тонкая, дорогая топ-панель */
     .top-bar {
-      padding: 20px;
-      min-height: 60px;
-      position: relative;
+      padding: 24px 28px;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .back-btn {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      border-radius: 28px;
       border: none;
-      background: white;
-      font-size: 22px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      font-size: 24px;
+      font-weight: 500;
+      color: #e6dfd3;
       cursor: pointer;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       display: none;
-      position: relative;
-      z-index: 20;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
     .back-btn.show {
-      display: inline-block;
+      display: flex;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(0.96);
     }
 
     .content {
       flex: 1;
       overflow-y: auto;
-      padding: 20px;
+      padding: 28px 28px 20px 28px;
+      scrollbar-width: thin;
+      scrollbar-color: #5a4a3a #1e1b18;
     }
 
+    .content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .content::-webkit-scrollbar-track {
+      background: #1e1b18;
+      border-radius: 10px;
+    }
+
+    .content::-webkit-scrollbar-thumb {
+      background: #5a4a3a;
+      border-radius: 10px;
+    }
+
+    /* главный экран — минимализм и ритм */
     .main-screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 32px;
+      height: 100%;
+    }
+
+    .year-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 25px;
-      height: 100%;
-      align-items: center;
+      gap: 28px;
     }
 
+    /* Кнопки годов — ТЕПЕРЬ КВАДРАТНЫЕ! aspect-ratio: 1/1 и ширина от родителя */
     .year-btn {
-      aspect-ratio: 1;
-      border-radius: 35px;
-      border: none;
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(10px);
-      font-size: 80px;
-      font-weight: 700;
-      color: #6b4c3b;
+      background: rgba(28, 26, 23, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;          /* чуть меньше скругление для строгого квадрата */
+      padding: 0;                   /* убираем отступы — полагаемся на aspect-ratio */
+      font-size: 72px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #ece3d8;
       cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      transition: all 0.25s ease;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-feature-settings: "tnum";
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+      aspect-ratio: 1 / 1;          /* ключевой момент: квадрат */
+      width: 100%;
     }
 
     .year-btn:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-      background: rgba(255,255,255,0.8);
+      background: rgba(40, 36, 32, 0.9);
+      transform: translateY(-6px);
+      border-color: rgba(255, 215, 170, 0.3);
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 24px;
     }
 
+    /* фото-карточка премиум */
     .photo {
-      aspect-ratio: 1;
-      border-radius: 25px;
-      background-color: #ddd;
+      aspect-ratio: 1 / 1;
+      border-radius: 28px;
+      background-color: #1f1c19;
       background-size: cover;
       background-position: center;
       cursor: pointer;
-      transition: 0.3s;
+      transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
       position: relative;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 15px 30px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%);
+      pointer-events: none;
+      border-radius: 28px;
     }
 
     .photo:hover {
-      transform: scale(1.03);
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      transform: scale(1.02);
+      box-shadow: 0 22px 40px -14px black;
+      border-color: rgba(255, 210, 150, 0.4);
     }
 
     .photo span {
       position: absolute;
-      bottom: 10px;
-      left: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      padding: 3px 10px;
-      border-radius: 10px;
-      font-size: 11px;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      color: #f0e7db;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
       text-align: center;
-      word-break: break-word;
+      z-index: 2;
+      border: 0.5px solid rgba(255, 255, 255, 0.15);
     }
 
+    /* папка — минималистичная, но выразительная */
     .folder {
-      aspect-ratio: 1;
-      border-radius: 30px;
-      background: rgba(235,222,205,0.7);
-      backdrop-filter: blur(10px);
+      aspect-ratio: 1 / 1;
+      border-radius: 32px;
+      background: rgba(35, 31, 28, 0.85);
+      backdrop-filter: blur(16px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: 0.3s;
-      font-size: 50px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      transition: all 0.25s;
+      font-size: 58px;
+      box-shadow: 0 12px 22px -10px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .folder:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      background: rgba(45, 40, 35, 0.9);
+      transform: translateY(-4px);
+      border-color: rgba(255, 200, 130, 0.3);
     }
 
     .folder .folder-name {
       font-size: 14px;
-      margin-top: 10px;
-      color: #5b4332;
-      text-align: center;
-      font-weight: 600;
+      margin-top: 12px;
+      color: #d9cfc0;
+      font-weight: 500;
+      letter-spacing: -0.2px;
     }
 
+    /* лайтбокс элегантный */
     .lightbox {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(8, 7, 6, 0.94);
+      backdrop-filter: blur(20px);
+      z-index: 1200;
       align-items: center;
       justify-content: center;
     }
@@ -181,153 +252,208 @@
     }
 
     .lightbox img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 20px;
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 32px;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .lightbox .close {
       position: absolute;
-      top: 20px;
-      right: 30px;
-      color: white;
-      font-size: 40px;
+      top: 28px;
+      right: 32px;
+      color: #ece3d8;
+      font-size: 42px;
+      font-weight: 300;
       cursor: pointer;
-    }
-
-    .player {
-      padding: 15px 20px;
-      background: rgba(255,255,255,0.5);
-      backdrop-filter: blur(15px);
+      background: rgba(0, 0, 0, 0.5);
+      width: 52px;
+      height: 52px;
+      border-radius: 60px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      transition: 0.2s;
+    }
+
+    .lightbox .close:hover {
+      background: rgba(0, 0, 0, 0.8);
+      transform: scale(0.95);
+    }
+
+    /* плеер — стильный, стёклянный */
+    .player {
+      padding: 16px 28px;
+      background: rgba(18, 16, 14, 0.7);
+      backdrop-filter: blur(28px);
+      display: flex;
+      align-items: center;
+      gap: 16px;
       flex-wrap: wrap;
-      border-top: 1px solid rgba(255,255,255,0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .player .song-label {
       font-size: 14px;
-      color: #5b4332;
+      font-weight: 500;
+      color: #e0d2c2;
       white-space: nowrap;
       cursor: pointer;
-      transition: all 0.3s;
-      padding: 5px 10px;
-      border-radius: 15px;
-      user-select: none;
+      transition: 0.2s;
+      padding: 6px 14px;
+      border-radius: 40px;
+      background: rgba(255, 255, 255, 0.03);
+      letter-spacing: -0.2px;
     }
 
     .player .song-label:hover {
-      background: rgba(0,0,0,0.05);
-      transform: scale(1.05);
-    }
-
-    .player .song-label:active {
-      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(0.98);
     }
 
     .player button {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      border-radius: 44px;
       border: none;
-      background: #e8d5c4;
-      font-size: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #eadbcb;
+      font-size: 20px;
       cursor: pointer;
-      flex-shrink: 0;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player button:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: scale(0.96);
     }
 
     .player .progress-wrap {
       flex: 1;
       display: flex;
       align-items: center;
-      gap: 8px;
-      min-width: 120px;
+      gap: 12px;
+      min-width: 140px;
     }
 
     .player .progress-wrap input[type="range"] {
       flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      background: #3e352c;
+      border-radius: 10px;
+    }
+
+    .player .progress-wrap input[type="range"]:focus {
+      outline: none;
+    }
+
+    .player .progress-wrap input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: #ecd9c2;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 5px #c9aa85;
     }
 
     .player .volume-wrap {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 8px;
     }
 
     .player .volume-wrap input[type="range"] {
       width: 80px;
+      height: 4px;
+      background: #3e352c;
+      border-radius: 10px;
+      -webkit-appearance: none;
+    }
+
+    .player .volume-wrap input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: #ecd9c2;
+      border-radius: 50%;
     }
 
     .player .time-text {
       font-size: 13px;
-      color: #5b4332;
-      min-width: 35px;
+      font-weight: 500;
+      color: #bfae9a;
+      font-feature-settings: 'tnum';
     }
 
+    /* лампочка — деликатная, без кринжа */
     .lamp-btn {
       position: fixed;
       bottom: 30px;
       left: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
+      width: 58px;
+      height: 58px;
+      border-radius: 58px;
       border: none;
-      background: rgba(255,255,255,0.7);
-      backdrop-filter: blur(10px);
+      background: rgba(24, 22, 20, 0.7);
+      backdrop-filter: blur(16px);
       cursor: pointer;
       z-index: 500;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      transition: all 0.3s;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.25s;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      font-size: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #f3e1cf;
     }
 
     .lamp-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-      background: rgba(255,255,200,0.8);
+      background: #2c2722;
+      transform: scale(1.03);
+      border-color: rgba(255, 210, 150, 0.5);
     }
 
-    .lamp-btn img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
+    /* секретная кнопка — невидимая, но стильная */
     .secret-btn {
       position: fixed;
-      top: 30px;
-      left: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
+      top: 32px;
+      left: 32px;
+      width: 52px;
+      height: 52px;
+      border-radius: 52px;
       border: none;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.01);
       cursor: pointer;
       z-index: 500;
-      transition: all 0.3s;
       opacity: 0;
+      transition: opacity 0.2s;
     }
 
     .secret-btn:hover {
-      background: rgba(255,255,255,0.4);
-      opacity: 0.3;
+      opacity: 0.2;
+      background: rgba(255, 255, 255, 0.08);
     }
 
+    /* модальные окна премиум */
     .modal-overlay {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 600;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(14px);
+      z-index: 1000;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(5px);
     }
 
     .modal-overlay.open {
@@ -335,116 +461,159 @@
     }
 
     .modal-card {
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 30px;
-      padding: 40px;
-      max-width: 450px;
+      background: rgba(20, 18, 16, 0.95);
+      backdrop-filter: blur(40px);
+      border-radius: 48px;
+      padding: 40px 44px;
+      max-width: 480px;
       width: 90%;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 50px 90px rgba(0, 0, 0, 0.5);
       text-align: center;
-      animation: fadeInUp 0.4s ease;
-      filter: none !important;
+      animation: modalFloat 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* Секретное окно — шире */
     .modal-card.wide {
-      max-width: 600px;
+      max-width: 680px;
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes modalFloat {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
 
     .modal-card h2 {
-      font-size: 24px;
-      color: #5b4332;
-      margin-bottom: 25px;
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -0.3px;
+      color: #efe3d5;
+      margin-bottom: 28px;
     }
 
     .creator-row {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
-      padding: 12px 0;
-      font-size: 16px;
+      padding: 14px 0;
+      font-size: 17px;
     }
 
     .creator-name {
-      font-weight: 700;
-      color: #3d2c20;
+      font-weight: 600;
+      color: #f0e2d2;
       min-width: 80px;
       text-align: left;
     }
 
     .creator-dots {
       flex: 1;
-      border-bottom: 2px dotted #c4a88b;
-      margin: 0 15px;
+      border-bottom: 2px dotted #5f4c39;
+      margin: 0 16px;
       height: 0;
     }
 
     .creator-role {
-      color: #8b7355;
+      color: #b7a187;
       text-align: right;
-      font-style: italic;
+      font-style: normal;
+      font-weight: 400;
     }
 
     .divider {
       border: none;
-      border-top: 1px solid #d4c4b0;
-      margin: 15px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin: 20px 0;
     }
 
     .close-modal {
-      margin-top: 25px;
-      padding: 10px 30px;
-      border-radius: 20px;
+      margin-top: 28px;
+      padding: 12px 32px;
+      border-radius: 40px;
       border: none;
-      background: #e8d5c4;
-      color: #5b4332;
-      font-size: 16px;
+      background: #2f2822;
+      color: #f2e5d9;
+      font-size: 15px;
+      font-weight: 500;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.2s;
     }
 
     .close-modal:hover {
-      background: #d4bda6;
+      background: #4f3d2f;
+      transform: scale(0.97);
     }
 
     .secret-text {
-      font-size: 20px;
-      color: #5b4332;
-      line-height: 1.8;
-      font-style: italic;
-      white-space: nowrap;
+      font-size: 18px;
+      color: #decbb6;
+      line-height: 1.6;
+      font-weight: 450;
+      margin: 12px 0;
+      font-family: monospace;
+      letter-spacing: -0.2px;
+      white-space: normal;
+      word-break: break-word;
     }
 
+    /* уведомление элегантное */
     .song-notification {
       position: fixed;
-      top: 20px;
+      top: 24px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(10px);
-      padding: 10px 25px;
-      border-radius: 25px;
+      background: rgba(28, 25, 22, 0.85);
+      backdrop-filter: blur(28px);
+      padding: 12px 24px;
+      border-radius: 60px;
       font-size: 14px;
-      color: #5b4332;
-      z-index: 700;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      animation: slideDown 0.3s ease, fadeOut 0.3s ease 1.7s forwards;
+      font-weight: 500;
+      color: #ecdbba;
+      z-index: 1300;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+      animation: slideDown 0.25s ease, fadeOut 0.2s ease 1.9s forwards;
       pointer-events: none;
+      border: 0.5px solid rgba(255, 215, 170, 0.3);
     }
 
     @keyframes slideDown {
-      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
     }
 
     @keyframes fadeOut {
-      to { opacity: 0; }
+      to {
+        opacity: 0;
+      }
+    }
+
+    /* небольшая адаптация */
+    @media (max-width: 700px) {
+      .app {
+        height: 92vh;
+        border-radius: 32px;
+      }
+      .grid {
+        gap: 14px;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+      .year-btn {
+        font-size: 56px;           /* чуть меньше шрифт, но квадрат сохраняется */
+      }
+      .modal-card {
+        padding: 28px 24px;
+      }
     }
   </style>
 </head>
@@ -454,25 +623,24 @@
   <div class="top-bar">
     <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
   </div>
-  
   <div class="content" id="content"></div>
   
   <div class="player">
     <span class="song-label" id="songLabel" onclick="switchSong()" title="Нажми, чтобы сменить песню">🎵 Любимая песня ярика</span>
     <button id="playBtn" onclick="togglePlay()">▶️</button>
     <div class="progress-wrap">
-      <input type="range" id="progress" value="0" min="0" max="100" oninput="seek()">
+      <input type="range" id="progress" value="0" min="0" max="100" step="0.1" oninput="seek()">
       <span class="time-text" id="time">0:00</span>
     </div>
     <div class="volume-wrap">
-      <span>🔊</span>
+      <span style="font-size: 14px;">🔊</span>
       <input type="range" id="volume" min="0" max="100" value="30" oninput="setVolume()">
     </div>
   </div>
 </div>
 
 <button class="lamp-btn" onclick="toggleCreators()" title="Создатели">
-  <img src="lamp.png" alt="Лампочка" onerror="this.parentElement.innerHTML='💡'">
+  💡
 </button>
 
 <button class="secret-btn" onclick="openSecret()" title=""></button>
@@ -481,27 +649,22 @@
 <div class="modal-overlay" id="creatorsOverlay" onclick="closeCreatorsOutside(event)">
   <div class="modal-card">
     <h2>✨ Создатели</h2>
-    
     <div class="creator-row">
       <span class="creator-name">Мирпик</span>
       <span class="creator-dots"></span>
       <span class="creator-role">Придумал сайт</span>
     </div>
-    
     <div class="creator-row">
       <span class="creator-name">Ёжик</span>
       <span class="creator-dots"></span>
       <span class="creator-role">Сгенерил его через дипсик</span>
     </div>
-    
     <hr class="divider">
-    
     <div class="creator-row">
       <span class="creator-name">Ярик</span>
       <span class="creator-dots"></span>
       <span class="creator-role">Зажал 50 рублей на хостинг</span>
     </div>
-    
     <button class="close-modal" onclick="closeCreators()">Понятно</button>
   </div>
 </div>
@@ -510,28 +673,13 @@
 <div class="modal-overlay" id="secretOverlay" onclick="closeSecretOutside(event)">
   <div class="modal-card wide">
     <h2>⚠️ ВНИМАНИЕ</h2>
-    <p class="secret-text">
-      Стоп, наблюдается взлом. Матрица дала сбой
-    </p>
-    <p class="secret-text">
-      Рефлексия затянула будто водоворот...
-    </p>
-    <p class="secret-text">
-      ЭТО ВСЕ НЕ СО МНОЙ
-    </p>
-    <p class="secret-text">
-      ЭТО ВСЕ НЕ СО МНОЙ
-    </p>
-    <p class="secret-text">
-      ЭТО ВСЕ НЕ СО МНОЙ
-    </p>
-    <p class="secret-text">
-      ЭТО ВСЕ НЕ СО МНОЙ
-    </p>
-    <p class="secret-text">
-      никто мой труд не может обесценить чем я
-    </p>
-
+    <p class="secret-text">Стоп, наблюдается взлом. Матрица дала сбой</p>
+    <p class="secret-text">Рефлексия затянула будто водоворот...</p>
+    <p class="secret-text">ЭТО ВСЕ НЕ СО МНОЙ</p>
+    <p class="secret-text">ЭТО ВСЕ НЕ СО МНОЙ</p>
+    <p class="secret-text">ЭТО ВСЕ НЕ СО МНОЙ</p>
+    <p class="secret-text">ЭТО ВСЕ НЕ СО МНОЙ</p>
+    <p class="secret-text">никто мой труд не может обесценить чем я</p>
     <button class="close-modal" onclick="closeSecret()">Осознать</button>
   </div>
 </div>
@@ -543,7 +691,7 @@
 
 <script>
 // ==========================================
-// НАСТРОЙКИ НАЗВАНИЙ ФОТО
+// НАЗВАНИЯ ФОТОГРАФИЙ (НЕ МЕНЯЛИСЬ)
 // ==========================================
 var photoNames = {
   'photo1.png': 'Дорога+',
@@ -565,7 +713,7 @@ var photoNames = {
 };
 
 // ==========================================
-// ДАННЫЕ
+// СТРУКТУРА АРХИВА
 // ==========================================
 var tree = {
   '2025': {
@@ -590,7 +738,7 @@ var tree = {
   }
 };
 
-// ============ СОСТОЯНИЕ ============
+// состояние
 var path = [];
 var currentSong = 'yarik';
 var audio = new Audio('song.mp3');
@@ -599,7 +747,6 @@ audio.volume = 0.3;
 var START_TIME = 33;
 var firstPlay = true;
 
-// ============ ФУНКЦИИ ============
 function getPhotoName(filename) {
   return photoNames[filename] || filename;
 }
@@ -608,17 +755,16 @@ function render() {
   var content = document.getElementById('content');
   var backBtn = document.getElementById('backBtn');
   
-  if (path.length > 0) {
-    backBtn.classList.add('show');
-  } else {
-    backBtn.classList.remove('show');
-  }
+  if (path.length > 0) backBtn.classList.add('show');
+  else backBtn.classList.remove('show');
   
   if (path.length === 0) {
     content.innerHTML = `
       <div class="main-screen">
-        <div class="year-btn" onclick="enterFolder('2025')">2025</div>
-        <div class="year-btn" onclick="enterFolder('2026')">2026</div>
+        <div class="year-row">
+          <div class="year-btn" onclick="enterFolder('2025')">2025</div>
+          <div class="year-btn" onclick="enterFolder('2026')">2026</div>
+        </div>
       </div>
     `;
     return;
@@ -637,12 +783,10 @@ function render() {
   }
   
   var html = '<div class="grid">';
-  
   if (current.photos) {
     for (var p = 0; p < current.photos.length; p++) {
       var photoFile = current.photos[p];
       var photoTitle = getPhotoName(photoFile);
-      
       html += '<div class="photo" style="background-image:url(\'' + photoFile + '\')" onclick="openPhoto(\'' + photoFile + '\', \'' + photoTitle + '\')">';
       html += '<span>' + photoTitle + '</span>';
       html += '</div>';
@@ -674,8 +818,9 @@ function goBack() {
 }
 
 function openPhoto(src, title) {
-  document.getElementById('lightboxImg').src = src;
-  document.getElementById('lightboxImg').alt = title;
+  var imgEl = document.getElementById('lightboxImg');
+  imgEl.src = src;
+  imgEl.alt = title;
   document.getElementById('lightbox').classList.add('open');
 }
 
@@ -686,7 +831,6 @@ function closeLightbox() {
 function switchSong() {
   var wasPlaying = !audio.paused;
   audio.pause();
-  
   if (currentSong === 'yarik') {
     currentSong = 'ezhik';
     audio.src = 'song_2.mp3';
@@ -700,18 +844,14 @@ function switchSong() {
     showNotification('Переключено на: Любимая песня ярика');
     firstPlay = true;
   }
-  
   audio.volume = document.getElementById('volume').value / 100;
   audio.loop = true;
   document.getElementById('progress').value = 0;
   document.getElementById('time').textContent = '0:00';
   document.getElementById('playBtn').textContent = '▶️';
-  
   if (wasPlaying) {
     audio.play().then(function() {
-      if (currentSong === 'yarik') {
-        audio.currentTime = START_TIME;
-      }
+      if (currentSong === 'yarik') audio.currentTime = START_TIME;
       document.getElementById('playBtn').textContent = '⏸️';
     }).catch(function() {});
   }
@@ -722,10 +862,9 @@ function showNotification(text) {
   notif.className = 'song-notification';
   notif.textContent = text;
   document.body.appendChild(notif);
-  setTimeout(function() { notif.remove(); }, 2000);
+  setTimeout(function() { if(notif && notif.remove) notif.remove(); }, 2000);
 }
 
-// ============ ОКНО СОЗДАТЕЛЕЙ ============
 function toggleCreators() {
   var overlay = document.getElementById('creatorsOverlay');
   var app = document.getElementById('appContainer');
@@ -744,12 +883,9 @@ function closeCreators() {
 }
 
 function closeCreatorsOutside(event) {
-  if (event.target === document.getElementById('creatorsOverlay')) {
-    closeCreators();
-  }
+  if (event.target === document.getElementById('creatorsOverlay')) closeCreators();
 }
 
-// ============ СЕКРЕТНОЕ ОКНО ============
 function openSecret() {
   var overlay = document.getElementById('secretOverlay');
   var app = document.getElementById('appContainer');
@@ -763,17 +899,13 @@ function closeSecret() {
 }
 
 function closeSecretOutside(event) {
-  if (event.target === document.getElementById('secretOverlay')) {
-    closeSecret();
-  }
+  if (event.target === document.getElementById('secretOverlay')) closeSecret();
 }
 
-// ============ ПЛЕЕР ============
+// плеер
 function togglePlay() {
   if (audio.paused) {
-    if (currentSong === 'yarik' && firstPlay) {
-      audio.currentTime = START_TIME;
-    }
+    if (currentSong === 'yarik' && firstPlay) audio.currentTime = START_TIME;
     firstPlay = false;
     audio.play();
     document.getElementById('playBtn').textContent = '⏸️';
@@ -784,17 +916,12 @@ function togglePlay() {
 }
 
 audio.addEventListener('timeupdate', function() {
-  if (audio.duration) {
-    if (currentSong === 'yarik' && firstPlay && audio.paused) {
-      document.getElementById('progress').value = 0;
-      document.getElementById('time').textContent = '0:00';
-    } else {
-      var pct = (audio.currentTime / audio.duration) * 100;
-      document.getElementById('progress').value = pct;
-      var m = Math.floor(audio.currentTime / 60);
-      var s = Math.floor(audio.currentTime % 60);
-      document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
-    }
+  if (audio.duration && !isNaN(audio.duration)) {
+    var pct = (audio.currentTime / audio.duration) * 100;
+    document.getElementById('progress').value = pct;
+    var m = Math.floor(audio.currentTime / 60);
+    var s = Math.floor(audio.currentTime % 60);
+    document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
   }
 });
 
@@ -804,8 +931,10 @@ audio.addEventListener('loadedmetadata', function() {
 });
 
 function seek() {
-  audio.currentTime = (document.getElementById('progress').value / 100) * audio.duration;
-  firstPlay = false;
+  if (audio.duration && !isNaN(audio.duration)) {
+    audio.currentTime = (document.getElementById('progress').value / 100) * audio.duration;
+    firstPlay = false;
+  }
 }
 
 function setVolume() {
@@ -819,6 +948,5 @@ audio.addEventListener('ended', function() {
 
 render();
 </script>
-
 </body>
 </html>
