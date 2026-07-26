@@ -2,955 +2,159 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Музей няшек — архив воспоминаний</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Всем и так похуй</title>
   <style>
+    /* Сброс и базовые стили */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-      background: #0c0b0a;
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 20px;
-      position: relative;
+      align-items: center;
+      background: linear-gradient(145deg, #2b2b2b 0%, #1a1a1a 100%);
+      font-family: 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
+      padding: 1rem;
+      margin: 0;
     }
 
-    /* премиум градиент — глубокий, тёплый, без неона */
-    .app {
+    /* Карточка — главный контейнер */
+    .card {
+      max-width: 700px;
       width: 100%;
-      max-width: 1300px;
-      height: 90vh;
-      min-height: 640px;
-      background: rgba(22, 20, 18, 0.75);
-      backdrop-filter: blur(32px);
-      border-radius: 48px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
-      position: relative;
-      z-index: 1;
-      transition: filter 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    }
-
-    .app.blurred {
-      filter: blur(10px);
-      backdrop-filter: blur(40px);
-    }
-
-    /* тонкая, дорогая топ-панель */
-    .top-bar {
-      padding: 24px 28px;
-      min-height: 72px;
-      display: flex;
-      align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .back-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 28px;
-      border: none;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(8px);
-      font-size: 24px;
-      font-weight: 500;
-      color: #e6dfd3;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    .back-btn.show {
-      display: flex;
-    }
-
-    .back-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: scale(0.96);
-    }
-
-    .content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px 28px 20px 28px;
-      scrollbar-width: thin;
-      scrollbar-color: #5a4a3a #1e1b18;
-    }
-
-    .content::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .content::-webkit-scrollbar-track {
-      background: #1e1b18;
-      border-radius: 10px;
-    }
-
-    .content::-webkit-scrollbar-thumb {
-      background: #5a4a3a;
-      border-radius: 10px;
-    }
-
-    /* главный экран — минимализм и ритм */
-    .main-screen {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 32px;
-      height: 100%;
-    }
-
-    .year-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
-    }
-
-    /* Кнопки годов — ТЕПЕРЬ КВАДРАТНЫЕ! aspect-ratio: 1/1 и ширина от родителя */
-    .year-btn {
-      background: rgba(28, 26, 23, 0.8);
+      padding: 4rem 3rem;
+      background: rgba(30, 30, 30, 0.75);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 28px;          /* чуть меньше скругление для строгого квадрата */
-      padding: 0;                   /* убираем отступы — полагаемся на aspect-ratio */
-      font-size: 72px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: #ece3d8;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-feature-settings: "tnum";
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
-      aspect-ratio: 1 / 1;          /* ключевой момент: квадрат */
-      width: 100%;
-    }
-
-    .year-btn:hover {
-      background: rgba(40, 36, 32, 0.9);
-      transform: translateY(-6px);
-      border-color: rgba(255, 215, 170, 0.3);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap: 24px;
-    }
-
-    /* фото-карточка премиум */
-    .photo {
-      aspect-ratio: 1 / 1;
-      border-radius: 28px;
-      background-color: #1f1c19;
-      background-size: cover;
-      background-position: center;
-      cursor: pointer;
-      transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 15px 30px -12px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .photo::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%);
-      pointer-events: none;
-      border-radius: 28px;
-    }
-
-    .photo:hover {
-      transform: scale(1.02);
-      box-shadow: 0 22px 40px -14px black;
-      border-color: rgba(255, 210, 150, 0.4);
-    }
-
-    .photo span {
-      position: absolute;
-      bottom: 16px;
-      left: 16px;
-      right: 16px;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(8px);
-      color: #f0e7db;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.01em;
-      text-align: center;
-      z-index: 2;
-      border: 0.5px solid rgba(255, 255, 255, 0.15);
-    }
-
-    /* папка — минималистичная, но выразительная */
-    .folder {
-      aspect-ratio: 1 / 1;
-      border-radius: 32px;
-      background: rgba(35, 31, 28, 0.85);
-      backdrop-filter: blur(16px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.25s;
-      font-size: 58px;
-      box-shadow: 0 12px 22px -10px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .folder:hover {
-      background: rgba(45, 40, 35, 0.9);
-      transform: translateY(-4px);
-      border-color: rgba(255, 200, 130, 0.3);
-    }
-
-    .folder .folder-name {
-      font-size: 14px;
-      margin-top: 12px;
-      color: #d9cfc0;
-      font-weight: 500;
-      letter-spacing: -0.2px;
-    }
-
-    /* лайтбокс элегантный */
-    .lightbox {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(8, 7, 6, 0.94);
-      backdrop-filter: blur(20px);
-      z-index: 1200;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .lightbox.open {
-      display: flex;
-    }
-
-    .lightbox img {
-      max-width: 90vw;
-      max-height: 85vh;
-      border-radius: 32px;
-      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .lightbox .close {
-      position: absolute;
-      top: 28px;
-      right: 32px;
-      color: #ece3d8;
-      font-size: 42px;
-      font-weight: 300;
-      cursor: pointer;
-      background: rgba(0, 0, 0, 0.5);
-      width: 52px;
-      height: 52px;
-      border-radius: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: 0.2s;
-    }
-
-    .lightbox .close:hover {
-      background: rgba(0, 0, 0, 0.8);
-      transform: scale(0.95);
-    }
-
-    /* плеер — стильный, стёклянный */
-    .player {
-      padding: 16px 28px;
-      background: rgba(18, 16, 14, 0.7);
-      backdrop-filter: blur(28px);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .player .song-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: #e0d2c2;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: 0.2s;
-      padding: 6px 14px;
-      border-radius: 40px;
-      background: rgba(255, 255, 255, 0.03);
-      letter-spacing: -0.2px;
-    }
-
-    .player .song-label:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: scale(0.98);
-    }
-
-    .player button {
-      width: 44px;
-      height: 44px;
-      border-radius: 44px;
-      border: none;
-      background: rgba(255, 255, 255, 0.08);
-      color: #eadbcb;
-      font-size: 20px;
-      cursor: pointer;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .player button:hover {
-      background: rgba(255, 255, 255, 0.18);
-      transform: scale(0.96);
-    }
-
-    .player .progress-wrap {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 140px;
-    }
-
-    .player .progress-wrap input[type="range"] {
-      flex: 1;
-      height: 4px;
-      -webkit-appearance: none;
-      background: #3e352c;
-      border-radius: 10px;
-    }
-
-    .player .progress-wrap input[type="range"]:focus {
-      outline: none;
-    }
-
-    .player .progress-wrap input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 14px;
-      height: 14px;
-      background: #ecd9c2;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 5px #c9aa85;
-    }
-
-    .player .volume-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .player .volume-wrap input[type="range"] {
-      width: 80px;
-      height: 4px;
-      background: #3e352c;
-      border-radius: 10px;
-      -webkit-appearance: none;
-    }
-
-    .player .volume-wrap input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      background: #ecd9c2;
-      border-radius: 50%;
-    }
-
-    .player .time-text {
-      font-size: 13px;
-      font-weight: 500;
-      color: #bfae9a;
-      font-feature-settings: 'tnum';
-    }
-
-    /* лампочка — деликатная, без кринжа */
-    .lamp-btn {
-      position: fixed;
-      bottom: 30px;
-      left: 30px;
-      width: 58px;
-      height: 58px;
-      border-radius: 58px;
-      border: none;
-      background: rgba(24, 22, 20, 0.7);
-      backdrop-filter: blur(16px);
-      cursor: pointer;
-      z-index: 500;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-      transition: all 0.25s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #f3e1cf;
-    }
-
-    .lamp-btn:hover {
-      background: #2c2722;
-      transform: scale(1.03);
-      border-color: rgba(255, 210, 150, 0.5);
-    }
-
-    /* секретная кнопка — невидимая, но стильная */
-    .secret-btn {
-      position: fixed;
-      top: 32px;
-      left: 32px;
-      width: 52px;
-      height: 52px;
-      border-radius: 52px;
-      border: none;
-      background: rgba(255, 255, 255, 0.01);
-      cursor: pointer;
-      z-index: 500;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .secret-btn:hover {
-      opacity: 0.2;
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    /* модальные окна премиум */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(14px);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-overlay.open {
-      display: flex;
-    }
-
-    .modal-card {
-      background: rgba(20, 18, 16, 0.95);
-      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(12px);
       border-radius: 48px;
-      padding: 40px 44px;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 50px 90px rgba(0, 0, 0, 0.5);
+      box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.04);
       text-align: center;
-      animation: modalFloat 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.4s ease;
     }
 
-    .modal-card.wide {
-      max-width: 680px;
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 
+        0 40px 80px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
-    @keyframes modalFloat {
-      from {
-        opacity: 0;
-        transform: scale(0.96) translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .modal-card h2 {
-      font-size: 26px;
-      font-weight: 500;
-      letter-spacing: -0.3px;
-      color: #efe3d5;
-      margin-bottom: 28px;
-    }
-
-    .creator-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      padding: 14px 0;
-      font-size: 17px;
-    }
-
-    .creator-name {
-      font-weight: 600;
-      color: #f0e2d2;
-      min-width: 80px;
-      text-align: left;
-    }
-
-    .creator-dots {
-      flex: 1;
-      border-bottom: 2px dotted #5f4c39;
-      margin: 0 16px;
-      height: 0;
-    }
-
-    .creator-role {
-      color: #b7a187;
-      text-align: right;
-      font-style: normal;
-      font-weight: 400;
-    }
-
-    .divider {
-      border: none;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin: 20px 0;
-    }
-
-    .close-modal {
-      margin-top: 28px;
-      padding: 12px 32px;
-      border-radius: 40px;
-      border: none;
-      background: #2f2822;
-      color: #f2e5d9;
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .close-modal:hover {
-      background: #4f3d2f;
-      transform: scale(0.97);
-    }
-
-    .secret-text {
-      font-size: 18px;
-      color: #decbb6;
-      line-height: 1.6;
-      font-weight: 450;
-      margin: 12px 0;
-      font-family: monospace;
-      letter-spacing: -0.2px;
-      white-space: normal;
+    /* Главный заголовок */
+    .main-headline {
+      font-size: clamp(2.8rem, 12vw, 5.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: #f0f0f0;
+      text-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.02);
+      margin-bottom: 0.4rem;
       word-break: break-word;
     }
 
-    /* уведомление элегантное */
-    .song-notification {
-      position: fixed;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(28, 25, 22, 0.85);
-      backdrop-filter: blur(28px);
-      padding: 12px 24px;
-      border-radius: 60px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #ecdbba;
-      z-index: 1300;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
-      animation: slideDown 0.25s ease, fadeOut 0.2s ease 1.9s forwards;
-      pointer-events: none;
-      border: 0.5px solid rgba(255, 215, 170, 0.3);
+    /* Акцентное подчеркивание (декоративная линия) */
+    .accent-line {
+      width: 80px;
+      height: 3px;
+      margin: 1.2rem auto 1.8rem;
+      background: linear-gradient(90deg, #888888, #bbbbbb, #888888);
+      border-radius: 6px;
+      opacity: 0.5;
+      transition: width 0.4s ease, opacity 0.3s ease;
     }
 
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-18px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
+    .card:hover .accent-line {
+      width: 120px;
+      opacity: 0.8;
     }
 
-    @keyframes fadeOut {
-      to {
-        opacity: 0;
-      }
+    /* Подзаголовок / доп. текст */
+    .sub-text {
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      font-weight: 300;
+      color: #9a9a9a;
+      letter-spacing: 0.3px;
+      line-height: 1.5;
+      margin-top: 0.6rem;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
     }
 
-    /* небольшая адаптация */
-    @media (max-width: 700px) {
-      .app {
-        height: 92vh;
+    .card:hover .sub-text {
+      opacity: 1;
+    }
+
+    /* Маленький декоративный элемент (символ) */
+    .symbol {
+      display: inline-block;
+      margin-top: 2rem;
+      font-size: 2rem;
+      color: #5a5a5a;
+      letter-spacing: 6px;
+      opacity: 0.25;
+      transition: opacity 0.4s ease, transform 0.3s ease;
+      user-select: none;
+    }
+
+    .card:hover .symbol {
+      opacity: 0.5;
+      transform: rotate(4deg) scale(1.02);
+    }
+
+    /* Адаптив для совсем маленьких экранов */
+    @media (max-width: 480px) {
+      .card {
+        padding: 2.5rem 1.5rem;
         border-radius: 32px;
       }
-      .grid {
-        gap: 14px;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      .accent-line {
+        width: 60px;
+        margin: 1rem auto 1.4rem;
       }
-      .year-btn {
-        font-size: 56px;           /* чуть меньше шрифт, но квадрат сохраняется */
+      .card:hover .accent-line {
+        width: 90px;
       }
-      .modal-card {
-        padding: 28px 24px;
+    }
+
+    /* Дополнительно — очень лёгкая анимация при загрузке */
+    @keyframes fadeSlide {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
       }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .card {
+      animation: fadeSlide 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
 <body>
+  <div class="card">
+    <!-- Основная фраза -->
+    <h1 class="main-headline">всем и так похуй</h1>
 
-<div class="app" id="appContainer">
-  <div class="top-bar">
-    <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
+    <!-- Декоративная линия -->
+    <div class="accent-line"></div>
+
+    <!-- Небольшой поясняющий текст (добавляет иронии) -->
+    <p class="sub-text">но мы всё равно сделали сайт</p>
+
+    <!-- Просто символ для завершения композиции -->
+    <div class="symbol">✦ ✦ ✦</div>
   </div>
-  <div class="content" id="content"></div>
-  
-  <div class="player">
-    <span class="song-label" id="songLabel" onclick="switchSong()" title="Нажми, чтобы сменить песню">🎵 Любимая песня ярика</span>
-    <button id="playBtn" onclick="togglePlay()">▶️</button>
-    <div class="progress-wrap">
-      <input type="range" id="progress" value="0" min="0" max="100" step="0.1" oninput="seek()">
-      <span class="time-text" id="time">0:00</span>
-    </div>
-    <div class="volume-wrap">
-      <span style="font-size: 14px;">🔊</span>
-      <input type="range" id="volume" min="0" max="100" value="30" oninput="setVolume()">
-    </div>
-  </div>
-</div>
-
-<button class="lamp-btn" onclick="toggleCreators()" title="Создатели">
-  💡
-</button>
-
-<button class="secret-btn" onclick="openSecret()" title=""></button>
-
-<!-- Окно создателей -->
-<div class="modal-overlay" id="creatorsOverlay" onclick="closeCreatorsOutside(event)">
-  <div class="modal-card">
-    <h2>✨ Создатели</h2>
-    <div class="creator-row">
-      <span class="creator-name">Мирпик</span>
-      <span class="creator-dots"></span>
-      <span class="creator-role">Придумал сайт</span>
-    </div>
-    <div class="creator-row">
-      <span class="creator-name">Ёжик</span>
-      <span class="creator-dots"></span>
-      <span class="creator-role">Сгенерил его через дипсик</span>
-    </div>
-    <hr class="divider">
-    <div class="creator-row">
-      <span class="creator-name">Ярик</span>
-      <span class="creator-dots"></span>
-      <span class="creator-role">Зажал 50 рублей на хостинг</span>
-    </div>
-    <button class="close-modal" onclick="closeCreators()">Понятно</button>
-  </div>
-</div>
-
-<!-- Секретное окно — широкое -->
-<div class="modal-overlay" id="secretOverlay" onclick="closeSecretOutside(event)">
-  <div class="modal-card wide">
-    <h2>⚠️ Стоп, наблюдается взлом. Матрица дала сбой</h2>
-    <p class="secret-text">Рефлексия затянула будто водоворот...</p>
-    <p class="secret-text">ЭТО ВСЕ НЕ СО МНОЙ</p>
-    <p class="secret-text">ЭТО ВСЕ НЕ СО МНОЙ</p>
-    <p class="secret-text">ЭТО ВСЕ НЕ СО МНОЙ</p>
-    <p class="secret-text">ЭТО ВСЕ НЕ СО МНОЙ</p>
-    <p class="secret-text">никто мой труд не может обесценить чем я</p>
-    <button class="close-modal" onclick="closeSecret()">Осознать</button>
-  </div>
-</div>
-
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <span class="close">✕</span>
-  <img id="lightboxImg" src="" alt="">
-</div>
-
-<script>
-// ==========================================
-// НАЗВАНИЯ ФОТОГРАФИЙ (НЕ МЕНЯЛИСЬ)
-// ==========================================
-var photoNames = {
-  'photo1.png': 'Дорога+',
-  'photo2.jpg': 'Дорога+ в ирлэ',
-  'photo3.jpg': 'Круговорот ежа в няшках',
-  'photo4.jpg': 'Ламинария...',
-  'photo5.jpg': 'Ньюгенчик не выдержки',
-  'photo6.jpg': 'По генеральски',
-  'photo7.jpg': 'Реальное лица ежа не фейк',
-  'photo8.png': 'Еж с презиками на крыше мск-сити',
-  'photo2026_1.jpg': 'Растер девушку на руках не фейк ебать',
-  'photo2026_2.jpg': 'Сложил руки блин',
-  'photo_side.jpg': 'хахах ноги отрезал вумин',
-  'photo_9.jpg': 'Гари харламов',
-  'photo_10.jpg': 'Белводс предатель',
-  'photo_11.jpg': 'Все дороги ведут в няшки',
-  'photo_12.jpg': 'ЗА БЕЛВОДСА !!!',
-  'photo_13.png': 'Мы один человек?...',
-  'Shotout_exile.jpg': 'Shotout Exile'   // <--- НОВАЯ ПОДПИСЬ
-};
-
-// ==========================================
-// СТРУКТУРА АРХИВА
-// ==========================================
-var tree = {
-  '2025': {
-    type: 'folder',
-    name: '2025',
-    photos: [
-      'photo1.png', 'photo2.jpg', 'photo3.jpg', 'photo4.jpg',
-      'photo5.jpg', 'photo6.jpg', 'photo7.jpg', 'photo8.png',
-      'photo_9.jpg', 'photo_10.jpg', 'photo_11.jpg',
-      'photo_12.jpg', 'photo_13.png'
-    ]
-  },
-  '2026': {
-    type: 'folder',
-    name: '2026',
-    photos: [
-      'photo2026_1.jpg',
-      'photo2026_2.jpg',
-      'Shotout_exile.jpg'   // <--- НОВАЯ КАРТИНКА В 2026
-    ],
-    folders: {
-      'побочные': {
-        photos: ['photo_side.jpg']
-      }
-    }
-  }
-};
-
-// состояние
-var path = [];
-var currentSong = 'yarik';
-var audio = new Audio('song.mp3');
-audio.loop = true;
-audio.volume = 0.3;
-var START_TIME = 33;
-var firstPlay = true;
-
-function getPhotoName(filename) {
-  return photoNames[filename] || filename;
-}
-
-function render() {
-  var content = document.getElementById('content');
-  var backBtn = document.getElementById('backBtn');
-  
-  if (path.length > 0) backBtn.classList.add('show');
-  else backBtn.classList.remove('show');
-  
-  if (path.length === 0) {
-    content.innerHTML = `
-      <div class="main-screen">
-        <div class="year-row">
-          <div class="year-btn" onclick="enterFolder('2025')">2025</div>
-          <div class="year-btn" onclick="enterFolder('2026')">2026</div>
-        </div>
-      </div>
-    `;
-    return;
-  }
-  
-  var current = tree;
-  for (var i = 0; i < path.length; i++) {
-    if (current.folders && current.folders[path[i]]) {
-      current = current.folders[path[i]];
-    } else if (current[path[i]]) {
-      current = current[path[i]];
-    } else {
-      content.innerHTML = '<p>Папка не найдена</p>';
-      return;
-    }
-  }
-  
-  var html = '<div class="grid">';
-  if (current.photos) {
-    for (var p = 0; p < current.photos.length; p++) {
-      var photoFile = current.photos[p];
-      var photoTitle = getPhotoName(photoFile);
-      html += '<div class="photo" style="background-image:url(\'' + photoFile + '\')" onclick="openPhoto(\'' + photoFile + '\', \'' + photoTitle + '\')">';
-      html += '<span>' + photoTitle + '</span>';
-      html += '</div>';
-    }
-  }
-  
-  if (current.folders) {
-    var folderNames = Object.keys(current.folders);
-    for (var f = 0; f < folderNames.length; f++) {
-      html += '<div class="folder" onclick="enterFolder(\'' + folderNames[f] + '\')">';
-      html += '📁';
-      html += '<div class="folder-name">' + folderNames[f] + '</div>';
-      html += '</div>';
-    }
-  }
-  
-  html += '</div>';
-  content.innerHTML = html;
-}
-
-function enterFolder(name) {
-  path.push(name);
-  render();
-}
-
-function goBack() {
-  path.pop();
-  render();
-}
-
-function openPhoto(src, title) {
-  var imgEl = document.getElementById('lightboxImg');
-  imgEl.src = src;
-  imgEl.alt = title;
-  document.getElementById('lightbox').classList.add('open');
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-}
-
-function switchSong() {
-  var wasPlaying = !audio.paused;
-  audio.pause();
-  if (currentSong === 'yarik') {
-    currentSong = 'ezhik';
-    audio.src = 'song_2.mp3';
-    document.getElementById('songLabel').textContent = '🎵 Любимая песня ёжика';
-    showNotification('Переключено на: Любимая песня ёжика');
-    firstPlay = false;
-  } else {
-    currentSong = 'yarik';
-    audio.src = 'song.mp3';
-    document.getElementById('songLabel').textContent = '🎵 Любимая песня ярика';
-    showNotification('Переключено на: Любимая песня ярика');
-    firstPlay = true;
-  }
-  audio.volume = document.getElementById('volume').value / 100;
-  audio.loop = true;
-  document.getElementById('progress').value = 0;
-  document.getElementById('time').textContent = '0:00';
-  document.getElementById('playBtn').textContent = '▶️';
-  if (wasPlaying) {
-    audio.play().then(function() {
-      if (currentSong === 'yarik') audio.currentTime = START_TIME;
-      document.getElementById('playBtn').textContent = '⏸️';
-    }).catch(function() {});
-  }
-}
-
-function showNotification(text) {
-  var notif = document.createElement('div');
-  notif.className = 'song-notification';
-  notif.textContent = text;
-  document.body.appendChild(notif);
-  setTimeout(function() { if(notif && notif.remove) notif.remove(); }, 2000);
-}
-
-function toggleCreators() {
-  var overlay = document.getElementById('creatorsOverlay');
-  var app = document.getElementById('appContainer');
-  if (overlay.classList.contains('open')) {
-    overlay.classList.remove('open');
-    app.classList.remove('blurred');
-  } else {
-    overlay.classList.add('open');
-    app.classList.add('blurred');
-  }
-}
-
-function closeCreators() {
-  document.getElementById('creatorsOverlay').classList.remove('open');
-  document.getElementById('appContainer').classList.remove('blurred');
-}
-
-function closeCreatorsOutside(event) {
-  if (event.target === document.getElementById('creatorsOverlay')) closeCreators();
-}
-
-function openSecret() {
-  var overlay = document.getElementById('secretOverlay');
-  var app = document.getElementById('appContainer');
-  overlay.classList.add('open');
-  app.classList.add('blurred');
-}
-
-function closeSecret() {
-  document.getElementById('secretOverlay').classList.remove('open');
-  document.getElementById('appContainer').classList.remove('blurred');
-}
-
-function closeSecretOutside(event) {
-  if (event.target === document.getElementById('secretOverlay')) closeSecret();
-}
-
-// плеер
-function togglePlay() {
-  if (audio.paused) {
-    if (currentSong === 'yarik' && firstPlay) audio.currentTime = START_TIME;
-    firstPlay = false;
-    audio.play();
-    document.getElementById('playBtn').textContent = '⏸️';
-  } else {
-    audio.pause();
-    document.getElementById('playBtn').textContent = '▶️';
-  }
-}
-
-audio.addEventListener('timeupdate', function() {
-  if (audio.duration && !isNaN(audio.duration)) {
-    var pct = (audio.currentTime / audio.duration) * 100;
-    document.getElementById('progress').value = pct;
-    var m = Math.floor(audio.currentTime / 60);
-    var s = Math.floor(audio.currentTime % 60);
-    document.getElementById('time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
-  }
-});
-
-audio.addEventListener('loadedmetadata', function() {
-  document.getElementById('progress').value = 0;
-  document.getElementById('time').textContent = '0:00';
-});
-
-function seek() {
-  if (audio.duration && !isNaN(audio.duration)) {
-    audio.currentTime = (document.getElementById('progress').value / 100) * audio.duration;
-    firstPlay = false;
-  }
-}
-
-function setVolume() {
-  audio.volume = document.getElementById('volume').value / 100;
-}
-
-audio.addEventListener('ended', function() {
-  document.getElementById('playBtn').textContent = '▶️';
-  if (currentSong === 'yarik') firstPlay = true;
-});
-
-render();
-</script>
 </body>
 </html>
